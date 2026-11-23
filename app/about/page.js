@@ -2,7 +2,7 @@ import LegalPage from '@/components/LegalPage';
 
 export const metadata = {
   title: 'About',
-  description: 'BoloPadho is an AI tutor that adapts to how you learn: your pace, confidence and learning style.',
+  description: 'BoloPadho is a voice-first AI study tutor for Hindi, English and Hinglish speakers. Apne Tarike Se Padho.',
 };
 
 export default function AboutPage() {
@@ -11,24 +11,25 @@ export default function AboutPage() {
       current="/about"
       title="About BoloPadho"
       showUpdated={false}
-      intro="BoloPadho is an AI tutor that adapts to you. Ask about any subject (maths, science, coding, history, languages, career skills) and it explains in the way that works best for you."
+      intro="BoloPadho is a voice-first AI study tutor. Many students can say their doubt in five seconds but need minutes to type it, especially in Hindi. So with BoloPadho you just speak: in Hindi, English or Hinglish, about any study subject, and it explains step by step in your own language. Apne Tarike Se Padho."
       sections={[
         {
           heading: 'What makes it different',
           body: [
-            'It learns your mindset: confidence, patience, learning style and how deep you like to go.',
-            'It changes its tone and depth to match: simpler and supportive when you are stuck, more challenging when you are doing well.',
-            'Teaching, Quiz, Revision and Doubt Solving modes switch on from what you ask.',
-            'It keeps track of topics you explore and areas that need more practice.',
-            'You can ask by typing, by voice, or by sending a photo of a question.',
+            'Voice first: tap the mic and speak. Numbers you say are repeated back ("Aapne 8 aur 5 bola, sahi?") before it solves, so a mishearing never becomes a wrong answer.',
+            'Answers are read aloud with the spoken word highlighted, and you can say "phir se batao", "aur simple karo", "ek example do" or "aage batao".',
+            'Say "samajh gaya" and it asks one quick check question. Topics you get wrong go to Need Practice for a 2-minute revision.',
+            'It learns how you learn (confidence, patience, learning style) and changes its tone and depth to match.',
+            'Teach, Simple, Hint, Solve, Quiz, Revise and more: pick the answer style you want, or let it choose.',
+            'Only for studies: school subjects, board and competitive exams, coding, languages and career skills.',
           ],
         },
         {
           heading: 'How it works',
           body: [
             'Create a free account. New accounts get welcome AU tokens.',
-            'Chat with the AI tutor. Each answer uses a small number of AU tokens from your wallet.',
-            'The more you learn, the more personal your tutor becomes.',
+            'Ask by voice, by typing or with a photo of your question. Each answer uses a small number of AU tokens; replaying an answer aloud is free.',
+            'Listen, ask follow-ups, then check yourself. The more you learn, the more personal your tutor becomes.',
           ],
         },
         {

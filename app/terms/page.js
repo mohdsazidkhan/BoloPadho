@@ -2,7 +2,7 @@ import LegalPage from '@/components/LegalPage';
 
 export const metadata = {
   title: 'Terms of Service',
-  description: 'The terms for using BoloPadho, the AI tutor that adapts to you.',
+  description: 'The terms for using BoloPadho, the voice-first AI study tutor.',
 };
 
 export default function TermsPage() {

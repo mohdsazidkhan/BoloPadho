@@ -159,7 +159,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
           {
             role: 'assistant',
             welcome: true,
-            content: `Hi ${user?.name?.split(' ')[0] || 'there'}! 👋 I'm your AI tutor. What would you like to learn today?\n\nYou can ask me *anything* — from **coding** to **science**, **history** to **math**. Let's explore together! 🚀`,
+            content: `Namaste ${user?.name?.split(' ')[0] || 'dost'}! 👋 Main aapka BoloPadho tutor hoon.\n\n**Mic dabakar apna sawaal bolo**, ya likho, ya book ki photo bhejo. Maths, science, English, history, coding ya koi bhi exam: main step by step samjhaunga, **apne tarike se**.`,
             timestamp: new Date(),
           },
         ];
@@ -691,7 +691,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
       {
         role: 'assistant',
         welcome: true,
-        content: `Starting a fresh session! 🌟 What would you like to explore?`,
+        content: `Naya session shuru! 🌟 Aaj kya padhna hai? Mic dabakar bolo ya likho.`,
         timestamp: new Date(),
       },
     ]);
@@ -703,10 +703,10 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
   };
 
   const suggestedTopics = [
-    '🐍 Explain Python decorators',
-    '🧠 How does memory work?',
-    '🌍 Tell me about climate change',
-    '📐 What is calculus?',
+    '📐 Triangle ka area kaise nikalte hain?',
+    '🌱 Photosynthesis simple tarike se samjhao',
+    '✍️ Present perfect tense kab use karte hain?',
+    '🧮 Percentage ke shortcut tricks batao',
   ];
 
   const showSuggestions = messages.length <= 1 && !reviseTopic;

@@ -1,27 +1,27 @@
 import Link from 'next/link';
-import { Brain, Zap, MessageCircle, TrendingUp, Target, ShieldCheck, Mic, Camera, ArrowRight } from 'lucide-react';
+import { Brain, Volume2, TrendingUp, CircleCheck, Mic, Camera, ArrowRight } from 'lucide-react';
 import Footer from '@/components/Footer';
 import HomeStats from '@/components/HomeStats';
 import LogoMark from '@/components/LogoMark';
 
 export const metadata = {
   title: 'BoloPadho — Apne Tarike Se Padho',
-  description: 'Learn anything with an AI tutor that adapts to your mindset, learning style, and pace.',
+  description: 'BoloPadho is a voice-first AI study tutor. Speak your doubt in Hindi, English or Hinglish, listen to a step-by-step answer, and check that you really understood. Apne Tarike Se Padho.',
 };
 
 const features = [
-  { icon: Brain, title: 'Mindset-aware AI', desc: 'The more you learn, the better it understands how you learn, and adapts its tone, depth and style to match.' },
-  { icon: Zap, title: 'Gamified learning', desc: 'Earn AU, level up and keep your streak going. Learning feels rewarding, not like a chore.' },
-  { icon: MessageCircle, title: 'Streaming answers', desc: 'Answers appear as they are written, so you never wait. It feels like chatting with a real tutor.' },
-  { icon: TrendingUp, title: 'Progress tracking', desc: 'See your strong topics, weak areas and learning progress on your dashboard.' },
-  { icon: Target, title: 'Personalised depth', desc: 'From a quick overview to a deep dive, answers match the level of detail you prefer.' },
-  { icon: ShieldCheck, title: 'Secure and private', desc: 'Your chats stay private to your account and are never sold.' },
+  { icon: Mic, title: 'Bolkar poochho', desc: 'Tap the mic and ask your doubt the way you speak, in Hindi, English or Hinglish. No typing needed.' },
+  { icon: Volume2, title: 'Sunkar samjho', desc: 'Every answer can be read aloud, with each word highlighted as it is spoken. Say "phir se batao" to hear it again, slowly.' },
+  { icon: Camera, title: 'Photo se sawaal', desc: 'Click a photo of the question in your book and get a step-by-step solution.' },
+  { icon: Brain, title: 'Apne tarike se', desc: 'Simple words or a deep dive, hints or a full solution. It matches your pace, confidence and learning style.' },
+  { icon: CircleCheck, title: 'Samjha ya nahi? Check karo', desc: 'Say "samajh gaya" and it asks one quick question to make sure you really understood.' },
+  { icon: TrendingUp, title: 'Kamzor topic, 2 minute revision', desc: 'Topics you get wrong are saved to Need Practice, so you can revise them the next day in two minutes.' },
 ];
 
 const steps = [
-  { title: 'Sign up', desc: 'Create your free account in 30 seconds. No credit card needed.' },
-  { title: 'Ask anything', desc: 'Type, speak or send a photo of your question to the AI tutor.' },
-  { title: 'AI adapts to you', desc: 'The more you chat, the more personal your tutor becomes.' },
+  { title: 'Free account banao', desc: 'Sign up in 30 seconds. New accounts get free AU to start.' },
+  { title: 'Bolo, likho ya photo bhejo', desc: 'Ask your study doubt in whichever way is easiest for you.' },
+  { title: 'Suno, samjho, check karo', desc: 'Listen to the answer, say "aur simple" or "ek example do", then test yourself.' },
 ];
 
 // Big headings: last word in the brand colour.
@@ -42,14 +42,15 @@ export default function LandingPage() {
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-brand-500/15 px-3 py-1 text-sm font-semibold text-brand-600">
               <span className="h-2 w-2 animate-pulse rounded-full bg-brand-500" />
-              AI-powered personalised learning
+              Voice-first AI tutor · Hindi, English, Hinglish
             </span>
             <h1 className="mt-4 text-3xl font-bold leading-tight text-surface-900 sm:text-4xl lg:text-5xl">
-              Learn anything with an AI tutor that adapts to <span className="text-brand-500">you</span>
+              Bolo apna sawaal. <span className="text-brand-500">Apne Tarike Se</span> Padho.
             </h1>
             <p className="mt-4 text-base leading-relaxed text-surface-500 sm:text-lg">
-              BoloPadho understands <strong className="font-semibold text-surface-900">how you think</strong>, matches your learning style
-              and gets smarter the more you use it. Ask by typing, by voice or with a photo.
+              Stuck on a question late at night? Just <strong className="font-semibold text-surface-900">tap the mic and speak</strong>.
+              BoloPadho explains step by step in your language, reads the answer aloud and checks that you really understood.
+              You can also type, or send a photo of your book.
             </p>
             <div className="mt-6 flex flex-col gap-2 sm:flex-row">
               <Link href="/auth/signup" className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 font-semibold text-white transition hover:brightness-110">
@@ -59,7 +60,7 @@ export default function LandingPage() {
                 Log in
               </Link>
             </div>
-            <p className="mt-3 text-sm text-surface-500">No credit card required · Free to start</p>
+            <p className="mt-3 text-sm text-surface-500">Free to start · For school, board and competitive exams</p>
           </div>
 
           {/* Chat preview */}
@@ -74,19 +75,19 @@ export default function LandingPage() {
             <div className="space-y-3 p-3 sm:p-4">
               <div className="flex justify-end">
                 <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-brand-500 px-3.5 py-2 text-sm text-white">
-                  How does the JavaScript event loop work? 🤔
+                  Bhaiya, triangle ka area wala sawaal samajh nahi aaya. Base 8, height 5.
                 </div>
               </div>
               <div className="flex items-end gap-2">
                 <LogoMark className="h-7 w-7 shrink-0" />
                 <div className="max-w-[85%] rounded-2xl rounded-bl-sm bg-surface-50 px-3.5 py-2 text-sm text-surface-900 shadow-card">
-                  Great question! 🌟 The event loop lets JavaScript stay <strong>non-blocking</strong> on a single thread. Think of
-                  a chef taking new orders while food is still cooking. Here&apos;s how it works, step by step…
+                  Koi baat nahi! Triangle ka area = <strong>½ × base × height</strong>. Yahan ½ × 8 × 5 = <strong>20 sq units</strong>.
+                  Socho ek rectangle ko beech se aadha kaat diya, to triangle bachta hai…
                 </div>
               </div>
               <div className="flex items-center gap-2 rounded-full bg-surface-50 p-1.5 pl-2 shadow-card">
                 <Camera className="h-5 w-5 text-surface-500" />
-                <span className="flex-1 truncate text-sm text-surface-400">Ask anything…</span>
+                <span className="flex-1 truncate text-sm text-surface-400">Bolo ya likho…</span>
                 <Mic className="h-5 w-5 text-surface-500" />
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-white"><ArrowRight className="h-4 w-4" /></span>
               </div>
@@ -99,8 +100,8 @@ export default function LandingPage() {
 
         {/* ── Features ───────────────────────────────────────────────────── */}
         <section className={card}>
-          <h2 className="text-2xl font-bold text-surface-900 sm:text-3xl"><AccentLast>Why BoloPadho is different</AccentLast></h2>
-          <p className="mt-1 text-surface-500">We don&apos;t just answer questions. We understand how you learn.</p>
+          <h2 className="text-2xl font-bold text-surface-900 sm:text-3xl"><AccentLast>Kyun BoloPadho?</AccentLast></h2>
+          <p className="mt-1 text-surface-500">Made for students who find it easier to speak a doubt than to type it.</p>
           <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {features.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="flex gap-3 rounded-lg border border-surface-200 p-3">
@@ -118,7 +119,7 @@ export default function LandingPage() {
 
         {/* ── How it works ───────────────────────────────────────────────── */}
         <section className={card}>
-          <h2 className="text-2xl font-bold text-surface-900 sm:text-3xl"><AccentLast>How it works</AccentLast></h2>
+          <h2 className="text-2xl font-bold text-surface-900 sm:text-3xl"><AccentLast>Bas teen steps</AccentLast></h2>
           <div className="mt-4 grid gap-3 md:grid-cols-3">
             {steps.map((s, i) => (
               <div key={s.title} className="flex gap-3 rounded-lg bg-surface-100 p-3">
@@ -136,11 +137,11 @@ export default function LandingPage() {
         <section className={`${card} flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left`}>
           <LogoMark className="h-14 w-14 shrink-0" />
           <div className="flex-1">
-            <h2 className="text-xl font-bold text-surface-900 sm:text-2xl"><AccentLast>Ready to learn smarter?</AccentLast></h2>
-            <p className="text-surface-500">Join learners who use BoloPadho every day.</p>
+            <h2 className="text-xl font-bold text-surface-900 sm:text-2xl"><AccentLast>Apna pehla sawaal bolo</AccentLast></h2>
+            <p className="text-surface-500">School homework, board exams or competitive exams: Apne Tarike Se Padho.</p>
           </div>
           <Link href="/auth/signup" className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 font-semibold text-white transition hover:brightness-110">
-            Get started free <ArrowRight className="h-4 w-4" />
+            Start free <ArrowRight className="h-4 w-4" />
           </Link>
         </section>
       </div>

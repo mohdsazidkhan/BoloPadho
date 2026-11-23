@@ -55,7 +55,7 @@ function LoginContent() {
   return (
     <AuthShell
       title={'Log in to BoloPadho'}
-      subtitle={'Continue your learning journey'}
+      subtitle={'Welcome back. Apna agla sawaal bolo.'}
     >
       {error && (
         <div className="mb-3 rounded-lg bg-coral-50 px-3 py-2.5 text-sm font-medium text-coral-600 animate-slide-up">

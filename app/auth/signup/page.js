@@ -47,7 +47,7 @@ export default function SignupPage() {
   return (
     <AuthShell
       title={'Create a new account'}
-      subtitle={'It’s quick and free to start'}
+      subtitle={'Free mein shuru karo. Bolo, suno aur samjho.'}
     >
       {error && (
         <div className="mb-3 rounded-lg bg-coral-50 px-3 py-2.5 text-sm font-medium text-coral-600 animate-slide-up">
