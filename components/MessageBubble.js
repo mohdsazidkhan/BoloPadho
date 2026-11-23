@@ -48,7 +48,8 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
   const isSystem = message.role === 'system';
   // Read aloud: the answer's timestamp is its id (ChatBox uses the same id to auto-read a new answer).
   // Old saved messages without a timestamp fall back to their database id.
-  const speakId = message.timestamp ? new Date(message.timestamp).getTime() : message._id || message.id || null;
+  // Role in the id: a question and its answer are often created in the same millisecond.
+  const speakId = message.timestamp ? `${message.role}-${new Date(message.timestamp).getTime()}` : message._id || message.id || null;
   const speakingId = useSpeakingId();
   const isSpeaking = speakId !== null && speakingId === speakId;
   const [speechOk, setSpeechOk] = useState(false);

@@ -385,7 +385,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
       );
 
       // Read the answer aloud when the learner asked by voice or turned Read aloud on.
-      if (viaVoice || readAloudRef.current) speak(answerAt.getTime(), accumulatedText);
+      if (viaVoice || readAloudRef.current) speak(`assistant-${answerAt.getTime()}`, accumulatedText); // same id as its MessageBubble
 
       // Check question / revision quiz asked: the next reply gets marked.
       if (sendMode === 'Check Question' || sendMode === 'Revision Quiz') setCheck(true);
@@ -728,7 +728,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
     const answer = lastAnswerRef.current;
     if (!answer || isStreaming) return;
     if (command === 'repeat') {
-      if (!speak(new Date(answer.timestamp).getTime(), answer.content, { slow: true })) toast.error(t('Your browser cannot read this aloud.'));
+      if (!speak(`assistant-${new Date(answer.timestamp).getTime()}`, answer.content, { slow: true })) toast.error(t('Your browser cannot read this aloud.'));
       return;
     }
     const request = COMMAND_REQUESTS[command];
