@@ -22,6 +22,7 @@ import { toast } from 'react-toastify';
 import { canSpeak, speak, stopSpeaking, useSpeakingId, onSpeechProgress } from '@/lib/speech';
 import { createSpeechHighlighter } from '@/lib/speechHighlight';
 import LogoMark from '@/components/LogoMark';
+import { useT } from '@/components/LanguageProvider';
 
 function formatTime(date) {
   if (!date) return '';
@@ -31,6 +32,7 @@ function formatTime(date) {
 // onRetry: shown as "Retry" on a failed/stopped answer, "Regenerate" on the latest finished one.
 // onStop: given while this answer is streaming.
 export default function MessageBubble({ message, compact = false, onRetry, onStop, onEdit }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
   // Editing a sent question (onEdit is given for the learner's own messages)
   const [editing, setEditing] = useState(false);
@@ -62,7 +64,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
   }, [isSpeaking, speakId]);
   const toggleListen = () => {
     if (isSpeaking) stopSpeaking();
-    else if (!speak(speakId, message.content)) toast.error('Your browser cannot read this aloud.');
+    else if (!speak(speakId, message.content)) toast.error(t('Your browser cannot read this aloud.'));
   };
 
   if (isSystem) return null;
@@ -89,7 +91,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
         await navigator.share(shareData);
       } else {
         await navigator.clipboard.writeText(`${shareData.text}\n\nShared from BoloPadho: ${shareData.url}`);
-        toast.info('Link/Content copied to share! 🚀');
+        toast.info(t('Link/Content copied to share! 🚀'));
       }
     } catch (err) {
       console.error('Error sharing:', err);
@@ -100,7 +102,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
     <div className="flex min-h-7 items-center gap-2">
       {!isUser && onRetry && (message.isError || message.cancelled) && (
         <button type="button" onClick={onRetry} className="inline-flex h-7 items-center gap-1 rounded-full bg-brand-500 px-2.5 text-xs font-semibold text-white transition hover:brightness-110">
-          <RotateCcw className="h-3 w-3" /> Retry
+          <RotateCcw className="h-3 w-3" /> {t('Retry')}
         </button>
       )}
       {canListen && (
@@ -108,27 +110,27 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
           type="button"
           onClick={toggleListen}
           aria-pressed={isSpeaking}
-          aria-label={isSpeaking ? 'Stop reading' : 'Listen to answer'}
-          title={isSpeaking ? 'Stop reading' : 'Listen to answer'}
+          aria-label={t(isSpeaking ? 'Stop reading' : 'Listen to answer')}
+          title={t(isSpeaking ? 'Stop reading' : 'Listen to answer')}
           className={`inline-flex h-7 items-center gap-1 rounded-full px-2.5 text-xs font-semibold transition-colors ${isSpeaking ? 'bg-brand-500 text-white hover:brightness-110' : 'bg-surface-100 text-surface-600 hover:bg-surface-200 hover:text-brand-600'}`}
         >
           {isSpeaking ? <Square className="h-3 w-3 fill-current" /> : <Volume2 className="h-3.5 w-3.5" />}
-          {isSpeaking ? 'Stop' : 'Listen'}
+          {t(isSpeaking ? 'Stop' : 'Listen')}
         </button>
       )}
       {!isUser && !message.isError && message.content?.trim() && (
         <div className="flex items-center gap-1 rounded-full border border-surface-200 bg-surface-100 px-1.5 py-0.5">
-          <button type="button" onClick={handleCopy} title="Copy response" aria-label="Copy response" className="p-1 text-surface-500 hover:text-brand-500">
+          <button type="button" onClick={handleCopy} title={t('Copy response')} aria-label={t('Copy response')} className="p-1 text-surface-500 hover:text-brand-500">
             {copied ? <Check size={13} className="text-brand-600" /> : <Copy size={13} />}
           </button>
           <span className="h-3 w-px bg-surface-200" />
-          <button type="button" onClick={handleShare} title="Share response" aria-label="Share response" className="p-1 text-surface-500 hover:text-brand-500">
+          <button type="button" onClick={handleShare} title={t('Share response')} aria-label={t('Share response')} className="p-1 text-surface-500 hover:text-brand-500">
             <Share2 size={13} />
           </button>
           {onRetry && !message.cancelled && (
             <>
               <span className="h-3 w-px bg-surface-200" />
-              <button type="button" onClick={onRetry} title="Regenerate answer" aria-label="Regenerate answer" className="p-1 text-surface-500 hover:text-brand-500">
+              <button type="button" onClick={onRetry} title={t('Regenerate answer')} aria-label={t('Regenerate answer')} className="p-1 text-surface-500 hover:text-brand-500">
                 <RotateCcw size={13} />
               </button>
             </>
@@ -147,7 +149,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
         <div className="flex-shrink-0 mb-1">
           {isUser ? (
             <div className="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white font-bold text-xs">
-              YOU
+              {t('YOU')}
             </div>
           ) : (
             <LogoMark className="w-8 h-8" />
@@ -165,7 +167,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
         >
           {isUser && editing ? (
             <div className="w-[min(70vw,520px)]">
-              <label htmlFor={`edit-${message.timestamp}`} className="sr-only">Edit your message</label>
+              <label htmlFor={`edit-${message.timestamp}`} className="sr-only">{t('Edit your message')}</label>
               <textarea
                 id={`edit-${message.timestamp}`}
                 autoFocus
@@ -181,10 +183,10 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
               />
               <div className="mt-2 flex justify-end gap-2">
                 <button type="button" onClick={() => setEditing(false)} className="h-8 rounded-full bg-white/20 px-3 text-xs font-semibold text-white transition hover:bg-white/30">
-                  Cancel
+                  {t('Cancel')}
                 </button>
                 <button type="button" onClick={submitEdit} disabled={!draft.trim()} className="h-8 rounded-full bg-white px-3 text-xs font-semibold text-brand-600 transition hover:brightness-95 disabled:opacity-50">
-                  Send
+                  {t('Send')}
                 </button>
               </div>
             </div>
@@ -202,7 +204,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
             <div ref={contentRef} className="prose dark:prose-invert prose-sm w-full min-w-0 max-w-none [overflow-wrap:anywhere] prose-headings:text-surface-900 prose-p:text-surface-800 prose-code:bg-surface-50 prose-code:rounded prose-code:px-1 prose-code:before:content-none prose-code:after:content-none prose-pre:bg-[#0d1117] prose-pre:text-[#e6edf3] prose-pre:overflow-x-auto [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_.katex-display]:overflow-x-auto [&_.katex-display]:py-1 [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto prose-strong:text-surface-900 prose-a:text-brand-600">
               {!message.content || message.content.trim() === '' ? (
                 message.cancelled ? (
-                  <p className="not-prose text-surface-500">You stopped this answer.</p>
+                  <p className="not-prose text-surface-500">{t('You stopped this answer.')}</p>
                 ) : (
                   <>
                     <WaitingWord />
@@ -212,7 +214,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
                         onClick={onStop}
                         className="not-prose mt-2 inline-flex h-8 items-center gap-1.5 rounded-full bg-surface-50 px-3 text-xs font-semibold text-surface-900 transition-colors hover:bg-surface-200"
                       >
-                        <Square className="h-3 w-3 fill-current" /> Stop
+                        <Square className="h-3 w-3 fill-current" /> {t('Stop')}
                       </button>
                     )}
                   </>
@@ -223,7 +225,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
                 </ReactMarkdown>
               )}
               {message.cancelled && message.content?.trim() && (
-                <p className="not-prose mt-2 text-xs font-semibold text-surface-500">Stopped</p>
+                <p className="not-prose mt-2 text-xs font-semibold text-surface-500">{t('Stopped')}</p>
               )}
             </div>
           )}
@@ -238,7 +240,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
             </span>
           )}
           {isUser && onEdit && !editing && (
-            <button type="button" onClick={startEdit} title="Edit message" aria-label="Edit message" className="flex h-7 w-7 items-center justify-center rounded-full text-surface-400 transition-colors hover:bg-surface-100 hover:text-brand-500 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100">
+            <button type="button" onClick={startEdit} title={t('Edit message')} aria-label={t('Edit message')} className="flex h-7 w-7 items-center justify-center rounded-full text-surface-400 transition-colors hover:bg-surface-100 hover:text-brand-500 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100">
               <Pencil className="h-3.5 w-3.5" />
             </button>
           )}

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import LogoMark from '@/components/LogoMark';
+import { T } from './LanguageProvider';
 
 export const LEGAL_LINKS = [
   { href: '/about', label: 'About' },
@@ -16,7 +17,7 @@ export function LegalLinks({ className = '' }) {
     <nav aria-label="Legal" className={`flex flex-wrap items-center gap-x-1 text-xs text-surface-500 ${className}`}>
       {LEGAL_LINKS.map((l) => (
         <span key={l.href} className="after:ml-1 after:content-['·'] last:after:content-none">
-          <Link href={l.href} className="hover:underline">{l.label}</Link>
+          <Link href={l.href} className="hover:underline"><T>{l.label}</T></Link>
         </span>
       ))}
       <span className="w-full pt-0.5">© {new Date().getFullYear()} BoloPadho</span>
@@ -31,12 +32,12 @@ export default function Footer() {
         <div className="flex items-center gap-2">
           <LogoMark className="h-8 w-8" />
           <p className="text-sm text-surface-500">
-            © {new Date().getFullYear()} <span className="font-semibold text-surface-900">BoloPadho</span> · Apne Tarike Se Padho
+            © {new Date().getFullYear()} <span className="font-semibold text-surface-900">BoloPadho</span> · <T>Apne Tarike Se Padho</T>
           </p>
         </div>
         <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-surface-500">
           {LEGAL_LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className="hover:text-surface-900 hover:underline">{l.label}</Link>
+            <Link key={l.href} href={l.href} className="hover:text-surface-900 hover:underline"><T>{l.label}</T></Link>
           ))}
         </nav>
       </div>

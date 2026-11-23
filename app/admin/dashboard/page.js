@@ -9,6 +9,7 @@ import { PageHeader, StatCard, card, greyBtn } from '@/components/admin/ui';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
+  const [health, setHealth] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,6 +17,7 @@ export default function AdminDashboard() {
       try {
         const response = await api.get('/admin/stats');
         setStats(response.stats);
+        setHealth(response.health || null);
       } catch (err) {
         console.error('Failed to fetch admin stats:', err);
       } finally {
@@ -116,11 +118,35 @@ export default function AdminDashboard() {
 
         <section className={`${card} p-3 sm:p-4`}>
           <h2 className="mb-3 text-lg font-bold text-surface-900">System <span className="text-brand-500">health</span></h2>
-          <div className="flex items-center gap-3 rounded-lg bg-brand-500/15 p-3">
-            <span className="h-3 w-3 animate-pulse rounded-full bg-brand-500" />
-            <p className="text-sm font-semibold text-brand-600">All services operational</p>
-          </div>
-          <p className="mt-2 text-sm text-surface-500">Token use and streak tracking are active.</p>
+          {(() => {
+            // Live checks from /api/admin/stats (refreshed on every visit)
+            const h = health;
+            const ok = h && h.dbOk && h.aiConfigured;
+            const rows = h ? [
+              ['Database', h.dbOk ? `Connected · ${h.dbPingMs} ms` : 'Not reachable', h.dbOk],
+              ['AI key', h.aiConfigured ? 'Configured' : 'Missing OPENROUTER_API_KEY', h.aiConfigured],
+              ['Answers (last 24 h)', String(h.answers24h), true],
+              ['Last answer', h.lastAnswerAt ? new Date(h.lastAnswerAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : 'None yet', true],
+            ] : [];
+            return (
+              <>
+                <div className={`flex items-center gap-3 rounded-lg p-3 ${loading ? 'bg-surface-100' : ok ? 'bg-brand-500/15' : 'bg-coral-500/15'}`}>
+                  <span className={`h-3 w-3 rounded-full ${loading ? 'bg-surface-400' : ok ? 'animate-pulse bg-brand-500' : 'bg-coral-500'}`} />
+                  <p className={`text-sm font-semibold ${loading ? 'text-surface-500' : ok ? 'text-brand-600' : 'text-coral-600'}`}>
+                    {loading ? 'Checking…' : ok ? 'All checks passing' : 'Something needs attention'}
+                  </p>
+                </div>
+                <dl className="mt-2 space-y-1">
+                  {rows.map(([label, value, good]) => (
+                    <div key={label} className="flex items-center justify-between gap-2 text-sm">
+                      <dt className="text-surface-500">{label}</dt>
+                      <dd className={`font-semibold ${good ? 'text-surface-900' : 'text-coral-600'}`}>{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </>
+            );
+          })()}
         </section>
       </div>
     </div>

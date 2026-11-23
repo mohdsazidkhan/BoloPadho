@@ -10,8 +10,10 @@ import { PageHeader, SearchField, StatCard, Pill, brandBtn, fmtDateTime } from '
 import DataView, { ViewToggle } from '@/components/admin/DataView';
 import { useViewMode } from '@/components/admin/useAdminList';
 import MobileFilters from '@/components/MobileFilters';
+import { useT } from '@/components/LanguageProvider';
 
 export default function TransactionsPage() {
+  const tr = useT();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -45,15 +47,15 @@ export default function TransactionsPage() {
 
   const statCards = (
     <>
-      <StatCard icon={Coins} label="Balance" value={`${user?.au ?? 0} AU`} tone="accent" compact />
-      <StatCard icon={Receipt} label="AU added" value={`${totals.added} AU`} compact />
-      <StatCard icon={Flame} label="AU used" value={`${totals.spent} AU`} tone="coral" compact />
+      <StatCard icon={Coins} label={tr("Balance")} value={`${user?.au ?? 0} AU`} tone="accent" compact />
+      <StatCard icon={Receipt} label={tr("AU added")} value={`${totals.added} AU`} compact />
+      <StatCard icon={Flame} label={tr("AU used")} value={`${totals.spent} AU`} tone="coral" compact />
     </>
   );
 
   const columns = [
     {
-      key: 'description', header: 'Description', primary: true,
+      key: 'description', header: tr('Description'), primary: true,
       render: (t) => {
         const plus = t.type === 'RECHARGE';
         return (
@@ -66,15 +68,15 @@ export default function TransactionsPage() {
         );
       },
     },
-    { key: 'type', header: 'Type', render: (t) => (t.type === 'RECHARGE' ? <Pill tone="brand">Recharge</Pill> : <Pill tone="coral">Spend</Pill>) },
+    { key: 'type', header: tr('Type'), render: (t) => (t.type === 'RECHARGE' ? <Pill tone="brand">{tr('Recharge')}</Pill> : <Pill tone="coral">{tr('Spend')}</Pill>) },
     {
-      key: 'amount', header: 'Amount',
+      key: 'amount', header: tr('Amount'),
       render: (t) => {
         const plus = t.type === 'RECHARGE';
         return <span className={`whitespace-nowrap font-semibold ${plus ? 'text-brand-600' : 'text-coral-600'}`}>{plus ? '+' : '−'}{t.amount} AU</span>;
       },
     },
-    { key: 'date', header: 'Date', className: 'whitespace-nowrap text-surface-500', render: (t) => fmtDateTime(t.createdAt) },
+    { key: 'date', header: tr('Date'), className: 'whitespace-nowrap text-surface-500', render: (t) => fmtDateTime(t.createdAt) },
   ];
 
   if (loading) return <PageLoader />;
@@ -86,13 +88,13 @@ export default function TransactionsPage() {
       <main className="flex-1 min-w-0 lg:ml-sidebar pt-navbar *:mx-auto *:w-full *:max-w-page *:p-3 lg:*:p-4 app-content">
         <div className="table-page self-padded animate-fade-in">
           {/* Phones/tablets: the totals sit at the top of the Filters drawer */}
-          <MobileFilters title="Summary"><div className="grid grid-cols-1 gap-2">{statCards}</div></MobileFilters>
+          <MobileFilters title={tr('Summary')}><div className="grid grid-cols-1 gap-2">{statCards}</div></MobileFilters>
           <PageHeader
-            title="Transaction History"
+            title={tr('Transaction History')}
             count={transactions.length}
-            search={<SearchField value={query} onChange={setQuery} placeholder="Search by description" label="Search transactions" />}
+            search={<SearchField value={query} onChange={setQuery} placeholder={tr('Search by description')} label={tr('Search transactions')} />}
             filters={<ViewToggle view={view} onChange={setView} />}
-            actions={<Link href="/user/wallet" className={brandBtn}><Wallet className="h-4 w-4" /> Wallet</Link>}
+            actions={<Link href="/user/wallet" className={brandBtn}><Wallet className="h-4 w-4" /> {tr('Wallet')}</Link>}
           />
 
           <div className="hidden grid-cols-3 gap-4 lg:grid">{statCards}</div>
@@ -103,16 +105,16 @@ export default function TransactionsPage() {
               columns={columns}
               rows={shown}
               rowKey={(t) => t._id}
-              empty={{ icon: Receipt, title: query ? 'No transactions match your search' : 'No transactions yet', text: query ? 'Try another word.' : 'Your AU spends and recharges will show here.' }}
+              empty={{ icon: Receipt, title: tr(query ? 'No transactions match your search' : 'No transactions yet'), text: tr(query ? 'Try another word.' : 'Your AU spends and recharges will show here.') }}
             />
           </section>
 
           <section className="fb-card flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4">
             <div>
-              <p className="font-semibold text-surface-900">Need to top up your wallet?</p>
-              <p className="text-sm text-surface-500">Contact support and we will recharge your AU.</p>
+              <p className="font-semibold text-surface-900">{tr('Need to top up your wallet?')}</p>
+              <p className="text-sm text-surface-500">{tr('Contact support and we will recharge your AU.')}</p>
             </div>
-            <Link href="/contact" className={brandBtn}>Contact support</Link>
+            <Link href="/contact" className={brandBtn}>{tr('Contact support')}</Link>
           </section>
         </div>
       </main>

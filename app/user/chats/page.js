@@ -10,8 +10,10 @@ import { PageHeader, SearchField, Pill, IconButton, brandBtn, fmtDateTime } from
 import DataView, { ViewToggle } from '@/components/admin/DataView';
 import { useViewMode } from '@/components/admin/useAdminList';
 import LogoMark from '@/components/LogoMark';
+import { useT } from '@/components/LanguageProvider';
 
 export default function ChatHistoryPage() {
+  const t = useT();
   const router = useRouter();
   const [chats, setChats] = useState([]);
   const [user, setUser] = useState(null);
@@ -48,24 +50,24 @@ export default function ChatHistoryPage() {
 
   const columns = [
     {
-      key: 'chat', header: 'Chat', primary: true,
+      key: 'chat', header: t('Chat'), primary: true,
       render: (c) => (
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-brand-600">
             <MessagesSquare className="h-5 w-5" />
           </span>
           <div className="min-w-0">
-            <p className="truncate font-semibold text-surface-900">{c.title || 'Untitled chat'}</p>
+            <p className="truncate font-semibold text-surface-900">{c.title || t('Untitled chat')}</p>
             {c.preview && <p className="truncate text-xs text-surface-500">{c.preview.replace(/[*_`#>]+/g, '').trim()}</p>}
           </div>
         </div>
       ),
     },
-    { key: 'topic', header: 'Topic', render: (c) => (c.topic && c.topic !== c.title ? <Pill tone="brand">{c.topic}</Pill> : <span className="text-surface-500">–</span>) },
-    { key: 'messages', header: 'Messages', align: 'center', render: (c) => <Pill>{c.messageCount || 0}</Pill> },
-    { key: 'updated', header: 'Last activity', className: 'whitespace-nowrap text-surface-500', render: (c) => fmtDateTime(c.updatedAt) },
+    { key: 'topic', header: t('Topic'), render: (c) => (c.topic && c.topic !== c.title ? <Pill tone="brand">{c.topic}</Pill> : <span className="text-surface-500">–</span>) },
+    { key: 'messages', header: t('Messages'), align: 'center', render: (c) => <Pill>{c.messageCount || 0}</Pill> },
+    { key: 'updated', header: t('Last activity'), className: 'whitespace-nowrap text-surface-500', render: (c) => fmtDateTime(c.updatedAt) },
     {
-      key: 'actions', header: 'Open', actions: true, align: 'right',
+      key: 'actions', header: t('Open'), actions: true, align: 'right',
       render: (c) => <div className="flex justify-end"><IconButton icon={ChevronRight} label="Open chat" tip="top" href={`/user/chat?sessionId=${c.sessionId}`} /></div>,
     },
   ];
@@ -79,20 +81,20 @@ export default function ChatHistoryPage() {
       <main className="flex-1 min-w-0 lg:ml-sidebar pt-navbar *:mx-auto *:w-full *:max-w-page *:p-3 lg:*:p-4 app-content">
         <div className="table-page self-padded animate-fade-in">
           <PageHeader
-            title="Recent Chats"
+            title={t('Recent Chats')}
             count={chats.length}
-            search={<SearchField value={query} onChange={setQuery} placeholder="Search your chats" label="Search chats" />}
+            search={<SearchField value={query} onChange={setQuery} placeholder={t('Search your chats')} label={t('Search chats')} />}
             filters={<ViewToggle view={view} onChange={setView} />}
-            actions={<Link href="/user/chat" className={brandBtn}><SquarePen className="h-4 w-4" /> New chat</Link>}
+            actions={<Link href="/user/chat" className={brandBtn}><SquarePen className="h-4 w-4" /> {t('New chat')}</Link>}
           />
 
           <section className="fb-card table-scroll">
             {chats.length === 0 ? (
               <div className="flex min-h-full flex-col items-center justify-center gap-3 px-4 py-12 text-center">
                 <LogoMark className="h-14 w-14" />
-                <p className="font-semibold text-surface-900">No chats yet</p>
-                <p className="text-sm text-surface-500">Ready to start your first session?</p>
-                <Link href="/user/chat" className={brandBtn}>Start learning</Link>
+                <p className="font-semibold text-surface-900">{t('No chats yet')}</p>
+                <p className="text-sm text-surface-500">{t('Ready to start your first session?')}</p>
+                <Link href="/user/chat" className={brandBtn}>{t('Start learning')}</Link>
               </div>
             ) : (
               <DataView
@@ -101,7 +103,7 @@ export default function ChatHistoryPage() {
                 rows={shown}
                 rowKey={(c) => c.sessionId}
                 onRowClick={open}
-                empty={{ icon: MessagesSquare, title: 'No chats match your search', text: 'Try another word from the title or topic.' }}
+                empty={{ icon: MessagesSquare, title: t('No chats match your search'), text: t('Try another word from the title or topic.') }}
               />
             )}
           </section>

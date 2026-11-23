@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Footer from './Footer';
 import LogoMark from '@/components/LogoMark';
+import { T } from './LanguageProvider';
 
 // Field style shared by the auth forms: one grey fill, thin brand ring on focus.
 export const authInput =
@@ -22,7 +23,7 @@ export default function AuthShell({ title, subtitle, children }) {
             </span>
           </Link>
           <p className="mt-3 hidden text-2xl leading-snug text-surface-900 sm:block">
-            Apne <span className="text-brand-500">Tarike</span> Se Padho.
+            <T>Apne Tarike Se Padho</T>.
           </p>
         </div>
 
@@ -33,10 +34,10 @@ export default function AuthShell({ title, subtitle, children }) {
             <div className="mt-4">{children}</div>
           </div>
           <p className="mt-4 text-center text-xs leading-relaxed text-surface-500">
-            By continuing, you agree to our{' '}
-            <Link href="/terms" className="font-semibold text-surface-900 hover:underline">Terms</Link>,{' '}
-            <Link href="/privacy" className="font-semibold text-surface-900 hover:underline">Privacy Policy</Link> and{' '}
-            <Link href="/disclaimer" className="font-semibold text-surface-900 hover:underline">Disclaimer</Link>.
+            <T>By continuing, you agree to our</T>{' '}
+            <Link href="/terms" className="font-semibold text-surface-900 hover:underline"><T>Terms</T></Link>,{' '}
+            <Link href="/privacy" className="font-semibold text-surface-900 hover:underline"><T>Privacy Policy</T></Link> <T>and</T>{' '}
+            <Link href="/disclaimer" className="font-semibold text-surface-900 hover:underline"><T>Disclaimer</T></Link>.
           </p>
         </div>
       </div>

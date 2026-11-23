@@ -4,6 +4,10 @@ import './globals.css';
 import { getAuthUserFromCookies } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import { liveStreak } from '@/lib/learnerLevel';
+import { LanguageProvider } from '@/components/LanguageProvider';
+import { getLang } from '@/lib/i18n/server';
+import { LANGS } from '@/lib/i18n';
 import Navbar from '@/components/Navbar';
 import BottomNav from '@/components/BottomNav';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -55,7 +59,7 @@ export default async function RootLayout({ children }) {
             role: authPayload.role || 'user',
             au: dbUser.au || 0,
             level: dbUser.level || 1,
-            streak: dbUser.streak || 0,
+            streak: liveStreak(dbUser),
             avatarUrl: dbUser.avatarUrl || `https://api.dicebear.com/8.x/fun-emoji/svg?seed=${encodeURIComponent(dbUser.name)}`,
           };
         }
@@ -65,8 +69,10 @@ export default async function RootLayout({ children }) {
     // Silently swallow errors — unauthenticated or DB not configured
   }
 
+  const lang = getLang();
+
   return (
-    <html lang="en">
+    <html lang={LANGS.find((l) => l.code === lang)?.htmlLang || 'en'}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -96,6 +102,7 @@ export default async function RootLayout({ children }) {
       </head>
       <body className="font-sans antialiased transition-colors duration-300">
         <ThemeProvider>
+          <LanguageProvider initialLang={lang}>
           <Navbar user={user} />
           <main className="min-h-screen">
             {children}
@@ -114,6 +121,7 @@ export default async function RootLayout({ children }) {
             theme="colored"
             style={{ top: 'calc(var(--navbar-h) + 8px)' }}
           />
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

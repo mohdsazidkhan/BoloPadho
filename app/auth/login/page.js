@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/Button';
 import AuthShell, { authInput } from '@/components/AuthShell';
+import { useT } from '@/components/LanguageProvider';
 import PasswordInput from '@/components/PasswordInput';
 import { PageLoader } from '@/components/Loader';
 
@@ -13,6 +14,7 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || null;
 
+  const t = useT();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -54,8 +56,8 @@ function LoginContent() {
 
   return (
     <AuthShell
-      title={'Log in to BoloPadho'}
-      subtitle={'Welcome back. Apna agla sawaal bolo.'}
+      title={t('Log in to BoloPadho')}
+      subtitle={t('Welcome back. Apna agla sawaal bolo.')}
     >
       {error && (
         <div className="mb-3 rounded-lg bg-coral-50 px-3 py-2.5 text-sm font-medium text-coral-600 animate-slide-up">
@@ -65,7 +67,7 @@ function LoginContent() {
 
       <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="sr-only" htmlFor="email">Email address</label>
+            <label className="sr-only" htmlFor="email">{t('Email address')}</label>
             <input
               id="email"
               name="email"
@@ -74,12 +76,12 @@ function LoginContent() {
               autoComplete="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Email address"
+              placeholder={t('Email address')}
               className={authInput}
             />
           </div>
           <div>
-            <label className="sr-only" htmlFor="password">Password</label>
+            <label className="sr-only" htmlFor="password">{t('Password')}</label>
             <PasswordInput
               id="password"
               name="password"
@@ -87,12 +89,12 @@ function LoginContent() {
               autoComplete="current-password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Password"
+              placeholder={t('Password')}
               className={authInput}
             />
           </div>
         <Button type="submit" fullWidth size="lg" loading={loading}>
-          Log in
+          {t('Log in')}
         </Button>
       </form>
 
@@ -100,7 +102,7 @@ function LoginContent() {
 
       <div className="flex justify-center">
         <Link href="/auth/signup" className="inline-flex h-11 items-center rounded-lg bg-surface-900 px-5 text-[15px] font-semibold text-surface-50 transition hover:opacity-90">
-          Create new account
+          {t('Create new account')}
         </Link>
       </div>
     </AuthShell>

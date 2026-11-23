@@ -9,8 +9,10 @@ import { buildSystemPrompt, buildTopicDetectionPrompt, buildWeakAreaPrompt, MODE
 import { calculateProfile, summarizeMetrics } from '@/lib/userProfile';
 import { generateCompletion } from '@/lib/ai';
 import Transaction from '@/models/Transaction';
+import { levelFor, touchStreak } from '@/lib/learnerLevel';
 
 import { uploadImage } from '@/lib/cloudinary';
+import { getLang } from '@/lib/i18n/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -123,6 +125,7 @@ export async function POST(request) {
       weakAreas: user.weakAreas,
       currentTopic: chat.topic || '',
       mode: activeMode,
+      lang: getLang(), // the site language from the navbar switch (cookie)
     });
 
     // ── Prepare message history for OpenAI ──────────────────────────────────
@@ -210,6 +213,9 @@ export async function POST(request) {
               if (user.weakAreas.length > 10) user.weakAreas.shift();
             } else if (practiceTopic && verdict === '✅') {
               user.weakAreas = user.weakAreas.filter((t) => t !== practiceTopic);
+              // Answered a check question right: this topic counts as strong.
+              if (!user.strongAreas.includes(practiceTopic)) user.strongAreas.push(practiceTopic);
+              if (user.strongAreas.length > 10) user.strongAreas.shift();
             }
           }
 
@@ -224,6 +230,11 @@ export async function POST(request) {
             amount: tokenCost,
             description: `Chat: ${chat.title.slice(0, 40)}${chat.title.length > 40 ? '...' : ''}`
           });
+
+          // Real progress: level from the number of answers so far, streak from today's activity.
+          const answeredSoFar = await Transaction.countDocuments({ userId: user._id, type: 'SPEND' });
+          user.level = levelFor(answeredSoFar);
+          touchStreak(user);
 
           // Track in chat session (tokens spent)
           chat.auEarned = (chat.auEarned || 0) + tokenCost;

@@ -12,6 +12,7 @@ import { canSpeak, speak, stopSpeaking, useSpeakingId } from '@/lib/speech';
 import { detectVoiceCommand, COMMAND_REQUESTS, COMMAND_CHIPS, numbersIn } from '@/lib/voiceCommands';
 import Link from 'next/link';
 import LogoMark from '@/components/LogoMark';
+import { useT, useLanguage } from '@/components/LanguageProvider';
 
 const DEBOUNCE_MS = 300;
 
@@ -70,6 +71,8 @@ function shrinkImage(file) {
 
 // reviseTopic: start a 2-minute revision quiz on this "Need Practice" topic (from the dashboard).
 export default function ChatBox({ user, initialSessionId = null, onSuccess, reviseTopic = null }) {
+  const t = useT();
+  const { lang } = useLanguage();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -110,7 +113,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
     readAloudRef.current = on;
     if (!on) stopSpeaking();
     try { localStorage.setItem('bolopadho-read-aloud', on ? '1' : '0'); } catch { /* storage unavailable */ }
-    toast.info(on ? 'Answers will be read aloud' : 'Read aloud is off', { autoClose: 1500 });
+    toast.info(t(on ? 'Answers will be read aloud' : 'Read aloud is off'), { autoClose: 1500 });
   };
 
   const chooseMode = (id) => {
@@ -159,7 +162,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
           {
             role: 'assistant',
             welcome: true,
-            content: `Namaste ${user?.name?.split(' ')[0] || 'dost'}! 👋 Main aapka BoloPadho tutor hoon.\n\n**Mic dabakar apna sawaal bolo**, ya likho, ya book ki photo bhejo. Maths, science, English, history, coding ya koi bhi exam: main step by step samjhaunga, **apne tarike se**.`,
+            i18nKey: 'Namaste {name}! 👋 Main aapka BoloPadho tutor hoon.\n\n**Mic dabakar apna sawaal bolo**, ya likho, ya book ki photo bhejo. Maths, science, English, history, coding ya koi bhi exam: main step by step samjhaunga, **apne tarike se**.',
+            i18nVars: { name: user?.name?.split(' ')[0] || '' },
             timestamp: new Date(),
           },
         ];
@@ -181,7 +185,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
             {
               role: 'assistant',
               welcome: true,
-              content: `Session not found or empty. Let's start fresh! 🌟`,
+              i18nKey: "Session not found or empty. Let's start fresh! 🌟",
               timestamp: new Date(),
             },
           ]);
@@ -225,11 +229,11 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
   // opts.base: the message list to continue from (a retry drops the old question + answer first).
   // opts.regenerate: the old answer was saved on the server, so the server replaces it.
   const sendMessage = useCallback(async (text, isRetry = false, photo = null, opts = {}) => {
-    const trimmed = text.trim() || (photo ? 'Explain this image and solve the question in it.' : '');
+    const trimmed = text.trim() || (photo ? t('Explain this image and solve the question in it.') : '');
     if (!trimmed || isStreaming) return;
     // Offline: keep the question in the box instead of losing it.
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-      toast.error('Internet nahi hai. Aapka sawaal box mein hai, internet aate hi bhej dijiye.');
+      toast.error(t('Internet nahi hai. Aapka sawaal box mein hai, internet aate hi bhej dijiye.'));
       setInput(trimmed);
       return;
     }
@@ -387,8 +391,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
       if (sendMode === 'Check Question' || sendMode === 'Revision Quiz') setCheck(true);
       if (sendMode === 'Check Reply') {
         const verdict = accumulatedText.trim().charAt(0);
-        if (verdict === '❌') toast.info('Ye topic "Need Practice" mein save ho gaya. Kal dashboard se 2 minute revise kar lena.', { autoClose: 5000 });
-        else if (verdict === '✅') toast.success('Shabash! Sahi jawab.');
+        if (verdict === '❌') toast.info(t('Ye topic "Need Practice" mein save ho gaya. Kal dashboard se 2 minute revise kar lena.'), { autoClose: 5000 });
+        else if (verdict === '✅') toast.success(t('Shabash! Sahi jawab.'));
       }
 
       // Show AU popup with current cost
@@ -423,9 +427,9 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
 
         toast.error(
           <div className="flex flex-col gap-2">
-            <p className="font-bold">Your BoloPadho AU wallet is empty! 🕳️</p>
+            <p className="font-bold">{t('Your BoloPadho AU wallet is empty! 🕳️')}</p>
             <p className="text-xs leading-relaxed opacity-90 font-medium">
-              To continue, please contact our support to recharge your tokens.
+              {t('To continue, please contact our support to recharge your tokens.')}
             </p>
             <div className="flex gap-2 mt-1">
               <a
@@ -476,7 +480,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
       setIsStreaming(false);
       inputRef.current?.focus();
     }
-  }, [isStreaming, messages, sessionId, trackMessage, mode]);
+  }, [isStreaming, messages, sessionId, trackMessage, mode, t]);
 
   // Stop the answer that is streaming right now.
   const stopStreaming = () => abortControllerRef.current?.abort();
@@ -518,18 +522,18 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
     e.target.value = '';
     if (!file) return;
     if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
-      toast.error('Only JPG or PNG images are allowed.');
+      toast.error(t('Only JPG or PNG images are allowed.'));
       return;
     }
     if (file.size > 15 * 1024 * 1024) {
-      toast.error('This image is too large. Please choose one under 15 MB.');
+      toast.error(t('This image is too large. Please choose one under 15 MB.'));
       return;
     }
     try {
       setImage(await shrinkImage(file));
       inputRef.current?.focus();
     } catch {
-      toast.error('Could not read this image.');
+      toast.error(t('Could not read this image.'));
     }
   };
 
@@ -547,14 +551,15 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         stream.getTracks().forEach((track) => track.stop());
       } catch (err) {
-        if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') toast.error(MIC_BLOCKED, { autoClose: 6000 });
-        else toast.error('No microphone found on this device.');
+        if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') toast.error(t(MIC_BLOCKED), { autoClose: 6000 });
+        else toast.error(t('No microphone found on this device.'));
         return;
       }
     }
     const recognition = new Recognition();
-    // Hindi browsers get hi-IN; everyone else Indian English (also handles Hinglish reasonably).
-    recognition.lang = (navigator.language || '').toLowerCase().startsWith('hi') ? 'hi-IN' : 'en-IN';
+    // Listen in the site language: Hindi -> hi-IN (Devanagari text); English and Hinglish -> en-IN,
+    // which writes Hinglish in Latin letters.
+    recognition.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
     recognition.interimResults = true;
     recognition.continuous = false;
     recognition.maxAlternatives = 1;
@@ -572,14 +577,14 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
     };
     recognition.onerror = (event) => {
       failed = true;
-      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') toast.error(MIC_BLOCKED, { autoClose: 6000 });
-      else if (event.error !== 'aborted') toast.error(VOICE_ERRORS[event.error] || NOISY, { autoClose: 5000 });
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') toast.error(t(MIC_BLOCKED), { autoClose: 6000 });
+      else if (event.error !== 'aborted') toast.error(t(VOICE_ERRORS[event.error] || NOISY), { autoClose: 5000 });
     };
     recognition.onend = () => {
       setListening(false);
       recognitionRef.current = null;
       if (failed) return;
-      if (!spoken) { toast.error(VOICE_ERRORS['no-speech']); return; }
+      if (!spoken) { toast.error(t(VOICE_ERRORS['no-speech'])); return; }
       const full = before ? `${before} ${spoken}` : spoken;
       // A short follow-up like "phir se batao" right after an answer is a command, not a question.
       const command = !before && !image && !checkPendingRef.current && lastAnswerRef.current ? detectVoiceCommand(spoken) : null;
@@ -589,8 +594,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
       // without numbers is sent by itself after a few seconds.
       const numbers = numbersIn(full);
       setHeard({ text: full, numbers, noisy, at: Date.now() });
-      if (numbers.length) speak('confirm-heard', `Aapne ${numbers.join(' aur ')} bola, sahi?`);
-      else if (noisy) speak('confirm-heard', NOISY);
+      if (numbers.length) speak('confirm-heard', t('Aapne {numbers} bola, sahi?', { numbers: numbers.join(t(' aur ')) }));
+      else if (noisy) speak('confirm-heard', t(NOISY));
     };
     recognitionRef.current = recognition;
     setListening(true);
@@ -658,18 +663,18 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
 
   const exportAction = async (kind) => {
     setExportOpen(false);
-    if (!exportable.length) { toast.info('Ask something first. There is nothing to export yet.'); return; }
+    if (!exportable.length) { toast.info(t('Ask something first. There is nothing to export yet.')); return; }
     try {
-      if (kind === 'txt') { downloadFile(buildText(), 'txt', 'text/plain'); toast.success('Chat downloaded'); }
-      else if (kind === 'md') { downloadFile(buildMarkdown(), 'md', 'text/markdown'); toast.success('Chat exported as Markdown'); }
-      else if (kind === 'copy') { await navigator.clipboard.writeText(buildText()); toast.success('Chat copied'); }
+      if (kind === 'txt') { downloadFile(buildText(), 'txt', 'text/plain'); toast.success(t('Chat downloaded')); }
+      else if (kind === 'md') { downloadFile(buildMarkdown(), 'md', 'text/markdown'); toast.success(t('Chat exported as Markdown')); }
+      else if (kind === 'copy') { await navigator.clipboard.writeText(buildText()); toast.success(t('Chat copied')); }
       else if (kind === 'share') {
         const text = buildText();
         if (navigator.share) await navigator.share({ title: 'BoloPadho: ' + chatTitle, text });
-        else { await navigator.clipboard.writeText(text); toast.success('Sharing is not available here, so the chat was copied'); }
+        else { await navigator.clipboard.writeText(text); toast.success(t('Sharing is not available here, so the chat was copied')); }
       }
     } catch (err) {
-      if (err?.name !== 'AbortError') toast.error('Could not complete that. Please try again.');
+      if (err?.name !== 'AbortError') toast.error(t('Could not complete that. Please try again.'));
     }
   };
 
@@ -691,7 +696,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
       {
         role: 'assistant',
         welcome: true,
-        content: `Naya session shuru! 🌟 Aaj kya padhna hai? Mic dabakar bolo ya likho.`,
+        i18nKey: 'Naya session shuru! 🌟 Aaj kya padhna hai? Mic dabakar bolo ya likho.',
         timestamp: new Date(),
       },
     ]);
@@ -707,7 +712,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
     '🌱 Photosynthesis simple tarike se samjhao',
     '✍️ Present perfect tense kab use karte hain?',
     '🧮 Percentage ke shortcut tricks batao',
-  ];
+  ].map((q) => t(q));
 
   const showSuggestions = messages.length <= 1 && !reviseTopic;
 
@@ -723,13 +728,13 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
     const answer = lastAnswerRef.current;
     if (!answer || isStreaming) return;
     if (command === 'repeat') {
-      if (!speak(new Date(answer.timestamp).getTime(), answer.content, { slow: true })) toast.error('Your browser cannot read this aloud.');
+      if (!speak(new Date(answer.timestamp).getTime(), answer.content, { slow: true })) toast.error(t('Your browser cannot read this aloud.'));
       return;
     }
     const request = COMMAND_REQUESTS[command];
     if (!request) return;
     if (fromVoice) voiceUsedRef.current = true;
-    sendMessage(request.text, false, null, { mode: request.mode, command: true });
+    sendMessage(t(request.text), false, null, { mode: request.mode, command: true }); // in the site language
   };
   runCommandRef.current = runCommand;
 
@@ -761,7 +766,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
     if (!reviseTopic || initialSessionId || reviseStarted.current || !user) return;
     reviseStarted.current = true;
     try { window.history.replaceState(null, '', window.location.pathname); } catch { /* ignore */ }
-    sendMessage(`2-minute revision: ${reviseTopic}`, false, null, { mode: 'Revision Quiz' });
+    sendMessage(t('2-minute revision: {topic}', { topic: reviseTopic }), false, null, { mode: 'Revision Quiz' });
   }, [reviseTopic, initialSessionId, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -775,8 +780,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
           {/* Phones: the navbar is hidden on this page, so give a way back */}
           <Link
             href="/user/dashboard"
-            aria-label="Back"
-            title="Back"
+            aria-label={t('Back')}
+            title={t('Back')}
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-surface-900 transition-colors hover:bg-surface-100 sm:h-9 sm:w-9 lg:hidden"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -785,10 +790,10 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
           <div className="min-w-0">
             <p className="whitespace-nowrap text-sm font-semibold text-surface-900 sm:text-[15px]">
               <span className="sm:hidden">BoloPadho</span>
-              <span className="hidden sm:inline">BoloPadho Tutor</span>
+              <span className="hidden sm:inline">{t('BoloPadho Tutor')}</span>
             </p>
             <p className={`hidden text-xs font-medium sm:block ${isStreaming ? 'text-brand-500 animate-pulse' : 'text-surface-400'}`}>
-              {isStreaming ? 'Thinking...' : 'Ready to teach'}
+              {t(isStreaming ? 'Thinking...' : 'Apne Tarike Se Padho')}
             </p>
           </div>
         </div>
@@ -797,8 +802,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
             <button
               type="button"
               onClick={stopSpeaking}
-              aria-label="Stop current speech"
-              title="Stop current speech"
+              aria-label={t('Stop current speech')}
+              title={t('Stop current speech')}
               className="flex h-8 w-8 items-center justify-center rounded-full bg-coral-500 text-white outline-none transition-colors hover:bg-coral-600 focus-visible:ring-2 focus-visible:ring-brand-500 sm:h-9 sm:w-9"
             >
               <Square className="h-3.5 w-3.5 fill-current" />
@@ -806,11 +811,11 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
           )}
           <button
             onClick={handleNewChat}
-            aria-label="New chat"
-            title="New chat"
+            aria-label={t('New chat')}
+            title={t('New chat')}
             className="flex h-8 w-8 items-center justify-center gap-1.5 rounded-full bg-surface-100 text-sm font-semibold text-surface-900 outline-none transition-colors hover:bg-surface-200 focus-visible:ring-2 focus-visible:ring-brand-500 sm:h-9 sm:w-auto sm:px-3"
           >
-            <SquarePen className="h-4 w-4" /> <span className="hidden sm:inline">New chat</span>
+            <SquarePen className="h-4 w-4" /> <span className="hidden sm:inline">{t('New chat')}</span>
           </button>
 
           {speechOk && (
@@ -819,7 +824,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
                 type="button"
                 onClick={toggleReadAloud}
                 aria-pressed={readAloud}
-                aria-label={readAloud ? 'Read aloud is on' : 'Read answers aloud'}
+                aria-label={t(readAloud ? 'Read aloud is on' : 'Read answers aloud')}
                 className={`flex h-8 w-8 items-center justify-center rounded-full outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 sm:h-9 sm:w-9 ${readAloud ? 'bg-brand-500 text-white hover:brightness-110' : 'bg-surface-100 text-surface-900 hover:bg-surface-200'}`}
               >
                 {readAloud ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
@@ -828,7 +833,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
                 role="tooltip"
                 className="pointer-events-none absolute right-1/2 top-full z-30 mt-1.5 hidden translate-x-1/2 whitespace-nowrap rounded-md bg-surface-900 px-2 py-1 text-xs font-medium text-surface-50 opacity-0 shadow-menu transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 lg:block"
               >
-                {readAloud ? 'Read aloud: on' : 'Read answers aloud'}
+                {t(readAloud ? 'Read aloud: on' : 'Read answers aloud')}
               </span>
             </div>
           )}
@@ -840,7 +845,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
                 <button
                   type="button"
                   onClick={() => exportAction(id)}
-                  aria-label={label}
+                  aria-label={t(label)}
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-100 text-surface-900 outline-none transition-colors hover:bg-surface-200 focus-visible:ring-2 focus-visible:ring-brand-500"
                 >
                   <Icon className="h-4 w-4" />
@@ -849,7 +854,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
                   role="tooltip"
                   className="pointer-events-none absolute right-1/2 top-full z-30 mt-1.5 translate-x-1/2 whitespace-nowrap rounded-md bg-surface-900 px-2 py-1 text-xs font-medium text-surface-50 opacity-0 shadow-menu transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
                 >
-                  {label}
+                  {t(label)}
                 </span>
               </div>
             ))}
@@ -860,8 +865,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
             <button
               type="button"
               onClick={() => setExportOpen((o) => !o)}
-              aria-label="Share or export chat"
-              title="Share or export chat"
+              aria-label={t('Share or export chat')}
+              title={t('Share or export chat')}
               aria-expanded={exportOpen}
               className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-100 text-surface-900 outline-none transition-colors hover:bg-surface-200 focus-visible:ring-2 focus-visible:ring-brand-500 sm:h-9 sm:w-9"
             >
@@ -878,7 +883,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
                     className="flex w-full items-center gap-3 rounded-lg p-2 text-left text-sm font-medium text-surface-900 transition-colors hover:bg-surface-100"
                   >
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-100"><Icon className="h-4 w-4" /></span>
-                    {label}
+                    {t(label)}
                   </button>
                 ))}
               </div>
@@ -903,7 +908,9 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
             return (
               <MessageBubble
                 key={msg._streamingId || i}
-                message={msg}
+                message={msg.i18nKey
+                  ? { ...msg, content: t(msg.i18nKey, { ...msg.i18nVars, name: msg.i18nVars?.name || t('dost') }) }
+                  : msg}
                 onRetry={canRetry ? () => retryAt(i) : undefined}
                 onEdit={msg.role === 'user' && !isStreaming ? (text) => editAt(i, text) : undefined}
                 onStop={msg._streamingId ? stopStreaming : undefined}
@@ -922,21 +929,21 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
                 onClick={() => runCommand(c.id)}
                 className={`h-8 rounded-full px-3 text-xs font-semibold transition-colors ${c.id === 'understood' ? 'bg-brand-500 text-white hover:brightness-110' : 'bg-surface-100 text-surface-900 hover:bg-surface-200'}`}
               >
-                {c.label}
+                {t(c.label)}
               </button>
             ))}
           </div>
         )}
         {!isStreaming && checkPending && (
           <p className="pl-10 text-xs font-semibold text-brand-600">
-            Jawab bolo ya likho, main check karunga.
+            {t('Jawab bolo ya likho, main check karunga.')}
           </p>
         )}
 
         {/* Suggested topics */}
         {showSuggestions && (
           <div className="mt-4 animate-slide-up">
-            <p className="text-sm font-semibold text-surface-500 mb-2 px-1">Try asking</p>
+            <p className="text-sm font-semibold text-surface-500 mb-2 px-1">{t('Try asking')}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {suggestedTopics.map((topic) => (
                 <button
@@ -959,7 +966,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
         <div className="flex-shrink-0 mx-3 mb-2 px-3 py-2.5 bg-coral-50 rounded-lg text-sm text-coral-600 font-medium animate-slide-up">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-base">⚠️</span>
-            <span>{error === 'INSUFFICIENT_AU' ? 'Insufficient AU balance' : error}</span>
+            <span>{error === 'INSUFFICIENT_AU' ? t('Insufficient AU balance') : error}</span>
           </div>
           {error === 'INSUFFICIENT_AU' && (
             <div className="mt-2 flex flex-wrap gap-2">
@@ -991,7 +998,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
       {/* Input area */}
       <div className="flex-shrink-0 p-2.5 sm:p-3 pb-[max(0.625rem,env(safe-area-inset-bottom))] border-t border-surface-200 bg-surface-50">
         {/* Answer style */}
-        <div className="mb-1.5 flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex-wrap lg:overflow-visible" role="radiogroup" aria-label="Answer style">
+        <div className="mb-1.5 flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex-wrap lg:overflow-visible" role="radiogroup" aria-label={t('Answer style')}>
           {MODE_CHIPS.map((m) => (
             <button
               key={m.id}
@@ -999,34 +1006,34 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
               role="radio"
               aria-checked={mode === m.id}
               onClick={() => chooseMode(m.id)}
-              title={m.hint}
+              title={t(m.hint)}
               className={`h-7 shrink-0 rounded-full px-2.5 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 ${mode === m.id ? 'bg-brand-500/15 text-brand-600' : 'bg-surface-100 text-surface-900 hover:bg-surface-200'}`}
             >
-              {m.label}
+              {t(m.label)}
             </button>
           ))}
         </div>
         {heard && (
           <div className="mb-2 rounded-xl border border-surface-200 bg-surface-100 p-2.5 animate-slide-up" role="status">
-            <p className="text-xs font-semibold text-surface-500">Maine suna:</p>
+            <p className="text-xs font-semibold text-surface-500">{t('Maine suna:')}</p>
             <p className="mt-0.5 break-words text-sm font-medium text-surface-900">
               {heard.text.split(/(\d+(?:[.,]\d+)?)/).map((part, i) => (/^\d/.test(part)
                 ? <mark key={i} className="rounded bg-brand-500/20 px-0.5 font-bold text-surface-900">{part}</mark>
                 : <span key={i}>{part}</span>))}
             </p>
             {heard.numbers.length > 0 && (
-              <p className="mt-1 text-xs text-surface-600">Aapne <b>{heard.numbers.join(' aur ')}</b> bola, sahi?</p>
+              <p className="mt-1 text-xs text-surface-600">{t('Aapne {numbers} bola, sahi?', { numbers: heard.numbers.join(t(' aur ')) })}</p>
             )}
-            {heard.noisy && <p className="mt-1 text-xs font-medium text-coral-600">{NOISY}</p>}
+            {heard.noisy && <p className="mt-1 text-xs font-medium text-coral-600">{t(NOISY)}</p>}
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
               <button type="button" onClick={confirmHeard} className="inline-flex h-8 items-center gap-1.5 rounded-full bg-brand-500 px-3 text-xs font-semibold text-white transition hover:brightness-110">
-                <Check className="h-3.5 w-3.5" /> Sahi hai{autoSend ? ', bhej raha hu…' : ''}
+                <Check className="h-3.5 w-3.5" /> {t(autoSend ? 'Sahi hai, bhej raha hu…' : 'Sahi hai')}
               </button>
               <button type="button" onClick={reSpeak} className="inline-flex h-8 items-center gap-1.5 rounded-full bg-surface-50 px-3 text-xs font-semibold text-surface-900 transition-colors hover:bg-surface-200">
-                <RotateCcw className="h-3.5 w-3.5" /> Phir se bolo
+                <RotateCcw className="h-3.5 w-3.5" /> {t('Phir se bolo')}
               </button>
               <button type="button" onClick={editHeard} className="inline-flex h-8 items-center gap-1.5 rounded-full bg-surface-50 px-3 text-xs font-semibold text-surface-900 transition-colors hover:bg-surface-200">
-                <Pencil className="h-3.5 w-3.5" /> Edit
+                <Pencil className="h-3.5 w-3.5" /> {t('Edit')}
               </button>
             </div>
             {autoSend && (
@@ -1044,13 +1051,13 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
               <button
                 type="button"
                 onClick={() => setImage(null)}
-                aria-label="Remove image"
+                aria-label={t('Remove image')}
                 className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-surface-50 text-surface-900 shadow ring-1 ring-surface-200"
               >
                 <X className="h-3 w-3" />
               </button>
             </span>
-            <span className="text-xs text-surface-400">Ask about this image or just press send.</span>
+            <span className="text-xs text-surface-400">{t('Ask about this image or just press send.')}</span>
           </div>
         )}
         {/* One row: photo, auto-growing text box, mic, send - all 36px and bottom-aligned (same as AajExam AI) */}
@@ -1060,8 +1067,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
             type="button"
             onClick={() => fileRef.current?.click()}
             disabled={isStreaming}
-            aria-label="Attach JPG or PNG image"
-            title="Attach JPG or PNG image"
+            aria-label={t('Attach JPG or PNG image')}
+            title={t('Attach JPG or PNG image')}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-surface-500 transition-colors hover:bg-surface-50 hover:text-brand-500 disabled:opacity-40"
           >
             <ImagePlus className="h-[18px] w-[18px]" />
@@ -1075,7 +1082,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
               if (!e.target.value.trim()) voiceUsedRef.current = false;
             }}
             onKeyDown={handleKeyDown}
-            placeholder={listening ? 'Listening… speak now' : MODE_CHIPS.find((c) => c.id === mode)?.placeholder || 'Ask anything…'}
+            placeholder={t(listening ? 'Listening… speak now' : MODE_CHIPS.find((c) => c.id === mode)?.placeholder || 'Ask anything…')}
             rows={1}
             disabled={isStreaming}
             className="block min-w-0 flex-1 resize-none self-end border-0 bg-transparent px-1.5 py-2 text-sm leading-5 text-surface-900 outline-none placeholder:text-surface-400 disabled:opacity-60"
@@ -1091,8 +1098,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
               onClick={listening ? stopVoice : startVoice}
               disabled={isStreaming}
               aria-pressed={listening}
-              aria-label={listening ? 'Stop listening' : 'Ask by voice'}
-              title={listening ? 'Stop listening' : 'Ask by voice'}
+              aria-label={t(listening ? 'Stop listening' : 'Ask by voice')}
+              title={t(listening ? 'Stop listening' : 'Ask by voice')}
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors disabled:opacity-40 ${listening ? 'animate-pulse bg-coral-500 text-white' : 'text-surface-500 hover:bg-surface-50 hover:text-brand-500'}`}
             >
               <Mic className="h-[18px] w-[18px]" />
@@ -1103,8 +1110,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
             <button
               type="button"
               onClick={stopStreaming}
-              aria-label="Stop answer"
-              title="Stop answer"
+              aria-label={t('Stop answer')}
+              title={t('Stop answer')}
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500 text-white transition hover:brightness-110"
             >
               <Square className="h-3.5 w-3.5 fill-current" />
@@ -1113,7 +1120,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
             <button
               type="submit"
               disabled={!input.trim() && !image}
-              aria-label="Send"
+              aria-label={t('Send')}
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500 text-white transition hover:brightness-110 disabled:opacity-40"
             >
               <Send className="h-4 w-4 -translate-x-px translate-y-px" />
@@ -1121,7 +1128,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
           )}
         </form>
         <p className="mt-1.5 text-center text-xs text-surface-400">
-          <span className="hidden sm:inline">Enter to send · Shift+Enter for a new line · </span>{process.env.NEXT_PUBLIC_EACH_CHAT_AU_TOKEN || 10} AU per answer · AI can make mistakes
+          <span className="hidden sm:inline">{t('Enter to send · Shift+Enter for a new line')} · </span>{t('{n} AU per answer · AI can make mistakes', { n: process.env.NEXT_PUBLIC_EACH_CHAT_AU_TOKEN || 10 })}
         </p>
       </div>
     </div>

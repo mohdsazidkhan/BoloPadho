@@ -3,6 +3,8 @@ import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import Chat from '@/models/Chat';
 import { getAuthUser } from '@/lib/auth';
+import Transaction from '@/models/Transaction';
+import { levelFor, answersToNextLevel, liveStreak, ANSWERS_PER_LEVEL } from '@/lib/learnerLevel';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,6 +50,16 @@ export async function GET(request) {
     ]);
 
     const stats = chatStats[0] || { totalSessions: 0, totalAU: 0, totalMessages: 0 };
+
+    // Real progress numbers: every tutor answer is one SPEND transaction.
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const [answers, answersThisWeek] = await Promise.all([
+      Transaction.countDocuments({ userId: user._id, type: 'SPEND' }),
+      Transaction.countDocuments({ userId: user._id, type: 'SPEND', createdAt: { $gte: weekAgo } }),
+    ]);
+    const level = levelFor(answers);
+    if (user.level !== level) await User.updateOne({ _id: user._id }, { $set: { level } });
+    const streak = liveStreak(user);
     console.log('[GET /api/user/profile] Success for:', user.email);
 
     return NextResponse.json({
@@ -58,12 +70,10 @@ export async function GET(request) {
         email: user.email,
         avatarUrl: user.avatarUrl,
         au: user.au,
-        level: user.level,
-        streak: user.streak,
+        level,
+        streak,
         longestStreak: user.longestStreak,
         badges: user.badges,
-        auProgress: user.auProgress,
-        auForNextLevel: user.auForNextLevel,
         weakAreas: user.weakAreas,
         strongAreas: user.strongAreas,
         topicsExplored: user.topicsExplored,
@@ -75,6 +85,10 @@ export async function GET(request) {
       stats: {
         totalSessions: stats.totalSessions,
         totalMessages: stats.totalMessages,
+        answers,
+        answersThisWeek,
+        answersToNextLevel: answersToNextLevel(answers),
+        answersPerLevel: ANSWERS_PER_LEVEL,
       },
       recentChats,
     });

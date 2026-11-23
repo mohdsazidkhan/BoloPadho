@@ -1,6 +1,7 @@
 import { Mail, MessageCircle, Clock, Headset, Rocket, ShieldCheck, GraduationCap } from 'lucide-react';
 import ContactForm from '@/components/ContactForm';
 import Footer from '@/components/Footer';
+import { getT } from '@/lib/i18n/server';
 import LogoMark from '@/components/LogoMark';
 
 export const metadata = {
@@ -18,10 +19,11 @@ const features = [
 ];
 
 export default function ContactPage() {
+  const t = getT();
   const details = [
     { icon: Mail, label: 'Email support', value: EMAIL, href: `mailto:${EMAIL}` },
     WHATSAPP && { icon: MessageCircle, label: 'WhatsApp', value: WHATSAPP, href: `https://wa.me/${WHATSAPP.replace(/\D/g, '')}` },
-    { icon: Clock, label: 'Working hours', value: '24/7 · replies within 24 hours' },
+    { icon: Clock, label: 'Working hours', value: t('24/7 · replies within 24 hours') },
   ].filter(Boolean);
 
   return (
@@ -33,8 +35,8 @@ export default function ContactPage() {
             <Headset className="h-6 w-6" />
           </span>
           <div>
-            <h1 className="text-2xl font-bold text-surface-900 sm:text-3xl">Contact <span className="text-brand-500">support</span></h1>
-            <p className="text-surface-500">Questions, AU recharge, feedback or partnerships: we would love to hear from you.</p>
+            <h1 className="text-2xl font-bold text-surface-900 sm:text-3xl">{t('Contact support')}</h1>
+            <p className="text-surface-500">{t('Questions, AU recharge, feedback or partnerships: we would love to hear from you.')}</p>
           </div>
         </section>
 
@@ -49,7 +51,7 @@ export default function ContactPage() {
                       <Icon className="h-5 w-5" />
                     </span>
                     <div className="min-w-0">
-                      <p className="text-sm text-surface-500">{label}</p>
+                      <p className="text-sm text-surface-500">{t(label)}</p>
                       <p className="break-all font-semibold text-surface-900">{value}</p>
                     </div>
                   </>
@@ -67,16 +69,16 @@ export default function ContactPage() {
             <section className="fb-card flex flex-1 items-center gap-3 p-4">
               <LogoMark className="h-11 w-11 shrink-0" />
               <div>
-                <h2 className="text-lg font-bold text-surface-900">We are here for you</h2>
-                <p className="text-sm text-surface-500">Learners always come first. Tell us what you need and we will help.</p>
+                <h2 className="text-lg font-bold text-surface-900">{t('We are here for you')}</h2>
+                <p className="text-sm text-surface-500">{t('Learners always come first. Tell us what you need and we will help.')}</p>
               </div>
             </section>
           </div>
 
           {/* Form */}
           <section className="fb-card p-4 xl:p-6">
-            <h2 className="text-2xl font-bold text-surface-900">Send a <span className="text-brand-500">message</span></h2>
-            <p className="mb-4 mt-0.5 text-sm text-surface-500">We usually reply within 24 hours. Write to us anytime.</p>
+            <h2 className="text-2xl font-bold text-surface-900">{t('Send a message')}</h2>
+            <p className="mb-4 mt-0.5 text-sm text-surface-500">{t('We usually reply within 24 hours. Write to us anytime.')}</p>
             <ContactForm />
           </section>
         </div>
@@ -88,8 +90,8 @@ export default function ContactPage() {
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-500/15 text-brand-600">
                 <Icon className="h-5 w-5" />
               </span>
-              <h3 className="font-semibold text-surface-900">{title}</h3>
-              <p className="max-w-[240px] text-sm text-surface-500">{desc}</p>
+              <h3 className="font-semibold text-surface-900">{t(title)}</h3>
+              <p className="max-w-[240px] text-sm text-surface-500">{t(desc)}</p>
             </article>
           ))}
         </section>

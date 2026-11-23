@@ -10,18 +10,27 @@ import { useTheme } from './ThemeProvider';
 import api from '@/lib/api';
 import { navFor, homeFor, isActivePath, avatarFor } from '@/lib/navItems';
 import LogoMark from '@/components/LogoMark';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useT } from './LanguageProvider';
 
 // Round grey icon button used for every header action (Facebook style).
 const roundBtn =
   'flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-surface-100 text-surface-900 outline-none transition-colors hover:bg-surface-200 focus-visible:ring-2 focus-visible:ring-brand-500';
 
+// Logo mark + "BoloPadho" with the tagline in small text underneath.
 export function Logo({ href = '/', onClick }) {
+  const t = useT();
   return (
     <Link href={href} onClick={onClick} className="flex shrink-0 items-center gap-1.5">
       <LogoMark className="h-8 w-8 sm:h-10 sm:w-10" />
-      <span className="text-lg font-bold leading-none sm:text-xl">
-        <span className="text-surface-900">Bolo</span>
-        <span className="text-brand-500">Padho</span>
+      <span className="flex flex-col">
+        <span className="text-lg font-bold leading-none sm:text-xl">
+          <span className="text-surface-900">Bolo</span>
+          <span className="text-brand-500">Padho</span>
+        </span>
+        <span className="mt-0.5 whitespace-nowrap text-[10px] font-medium leading-none text-surface-500 sm:text-[11px]">
+          {t('Apne Tarike Se Padho')}
+        </span>
       </span>
     </Link>
   );
@@ -30,6 +39,7 @@ export function Logo({ href = '/', onClick }) {
 export default function Navbar({ user }) {
   const router = useRouter();
   const pathname = usePathname();
+  const t = useT();
   const { theme, toggleTheme } = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -116,8 +126,8 @@ export default function Navbar({ user }) {
                   <Link
                     key={href}
                     href={href}
-                    title={label}
-                    aria-label={label}
+                    title={t(label)}
+                    aria-label={t(label)}
                     aria-current={active ? 'page' : undefined}
                     className="relative flex w-[60px] items-center justify-center rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-brand-500 lg:w-[96px]"
                   >
@@ -136,7 +146,7 @@ export default function Navbar({ user }) {
             {user && !isAdmin && (
               <Link
                 href="/user/wallet"
-                title="AU balance"
+                title={t('AU balance')}
                 className="hidden h-10 items-center gap-1.5 rounded-full bg-surface-100 px-3 text-sm font-semibold text-surface-900 transition-colors hover:bg-surface-200 xs:flex"
               >
                 <Coins className="h-4 w-4 text-accent-500" />
@@ -149,9 +159,9 @@ export default function Navbar({ user }) {
                 type="button"
                 onClick={pageFilters.toggle}
                 className={`${roundBtn} lg:hidden ${filters.open ? 'bg-brand-500/15 text-brand-600' : ''}`}
-                aria-label="Search and filters"
+                aria-label={t('Search and filters')}
                 aria-expanded={filters.open}
-                title="Search and filters"
+                title={t('Search and filters')}
               >
                 <SlidersHorizontal className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
@@ -161,12 +171,13 @@ export default function Navbar({ user }) {
             ) : (
               <NotificationBell
                 endpoint="/user/notifications"
-                seeAll={{ href: '/user/transactions', label: 'See transaction history' }}
-                emptyText="Recharges and account updates will show up here."
+                seeAll={{ href: '/user/transactions', label: t('See transaction history') }}
+                emptyText={t('Recharges and account updates will show up here.')}
                 onNew={() => router.refresh()}
               />
             ))}
-            <button type="button" onClick={toggleTheme} className={roundBtn} aria-label="Toggle theme" title="Toggle theme">
+            <LanguageSwitcher buttonClass={roundBtn} />
+            <button type="button" onClick={toggleTheme} className={roundBtn} aria-label={t('Toggle theme')} title={t('Toggle theme')}>
               {theme === 'dark' ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
             </button>
 
@@ -175,7 +186,7 @@ export default function Navbar({ user }) {
                 <button
                   type="button"
                   onClick={() => setMenuOpen((o) => !o)}
-                  aria-label="Account"
+                  aria-label={t('Account')}
                   aria-expanded={menuOpen}
                   className="flex h-8 w-8 shrink-0 overflow-hidden sm:h-10 sm:w-10 rounded-full bg-surface-100 outline-none transition hover:brightness-95 focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-50"
                 >
@@ -197,13 +208,13 @@ export default function Navbar({ user }) {
                       {items.filter((i) => !i.tab || i.href === profileHref).map(({ href, label, icon: Icon }) => (
                         <Link key={href} href={href} className="flex items-center gap-3 rounded-lg p-2 text-sm font-medium text-surface-900 transition-colors hover:bg-surface-100">
                           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-100"><Icon className="h-5 w-5" /></span>
-                          <span className="flex-1">{label}</span>
+                          <span className="flex-1">{t(label)}</span>
                           <ChevronRight className="h-5 w-5 text-surface-500" />
                         </Link>
                       ))}
                       <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 rounded-lg p-2 text-sm font-medium text-coral-600 transition-colors hover:bg-surface-100">
                         <span className="flex h-9 w-9 items-center justify-center rounded-full bg-coral-50"><LogOut className="h-5 w-5" /></span>
-                        Log out
+                        {t('Log out')}
                       </button>
                     </div>
                   </div>
@@ -212,10 +223,10 @@ export default function Navbar({ user }) {
             ) : (
               <div className="hidden items-center gap-2 xs:flex">
                 <Link href="/auth/login" className="flex h-10 items-center rounded-lg bg-surface-100 px-4 text-sm font-semibold text-surface-900 transition-colors hover:bg-surface-200">
-                  Log in
+                  {t('Log in')}
                 </Link>
                 <Link href="/auth/signup" className="flex h-10 items-center rounded-lg bg-brand-500 px-4 text-sm font-semibold text-white transition hover:brightness-110">
-                  Sign up
+                  {t('Sign up')}
                 </Link>
               </div>
             )}
@@ -225,9 +236,9 @@ export default function Navbar({ user }) {
               type="button"
               onClick={handleMenu}
               className={`${roundBtn} ${user ? '' : 'xs:hidden'}`}
-              aria-label={menuShowsClose ? 'Close menu' : 'Open menu'}
+              aria-label={t(menuShowsClose ? 'Close menu' : 'Open menu')}
               aria-expanded={menuShowsClose}
-              title={menuShowsClose ? 'Close menu' : 'Open menu'}
+              title={t(menuShowsClose ? 'Close menu' : 'Open menu')}
             >
               {menuShowsClose ? <X className="h-4 w-4 sm:h-5 sm:w-5" /> : <Menu className="h-4 w-4 sm:h-5 sm:w-5" />}
             </button>
@@ -243,14 +254,14 @@ export default function Navbar({ user }) {
         />
         <aside
           role="dialog"
-          aria-label="Search and filters"
+          aria-label={t('Search and filters')}
           className={`absolute inset-y-0 right-0 flex w-[320px] max-w-[88vw] flex-col bg-surface-50 shadow-menu transition-transform duration-300 ease-out ${filters.open ? 'translate-x-0' : 'translate-x-full'}`}
         >
           <div className="flex h-navbar shrink-0 items-center justify-between border-b border-surface-200 px-3">
             <p className="flex items-center gap-2 text-lg font-bold text-surface-900">
-              <SlidersHorizontal className="h-5 w-5 text-brand-500" /> Filters
+              <SlidersHorizontal className="h-5 w-5 text-brand-500" /> {t('Filters')}
             </p>
-            <button type="button" onClick={pageFilters.close} className={roundBtn} aria-label="Close filters">
+            <button type="button" onClick={pageFilters.close} className={roundBtn} aria-label={t('Close filters')}>
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -269,7 +280,7 @@ export default function Navbar({ user }) {
         >
           <div className="flex h-navbar items-center justify-between border-b border-surface-200 px-3">
             <Logo href={homeFor(user)} onClick={() => setDrawerOpen(false)} />
-            <button type="button" onClick={() => setDrawerOpen(false)} className={roundBtn} aria-label="Close menu">
+            <button type="button" onClick={() => setDrawerOpen(false)} className={roundBtn} aria-label={t('Close menu')}>
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -282,7 +293,7 @@ export default function Navbar({ user }) {
                   <img src={avatarFor(user)} alt="" className="h-9 w-9 rounded-full bg-surface-100 object-cover" />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-surface-900">{user.name}</p>
-                    <p className="truncate text-xs text-surface-500">{isAdmin ? 'System admin' : `Level ${user.level} · ${user.au} AU`}</p>
+                    <p className="truncate text-xs text-surface-500">{isAdmin ? t('System admin') : t('Level {level} · {au} AU', { level: user.level, au: user.au })}</p>
                   </div>
                 </Link>
                 {items.map(({ href, label, icon: Icon }) => {
@@ -294,15 +305,15 @@ export default function Navbar({ user }) {
                       className={`flex items-center gap-3 rounded-lg p-2 text-[15px] font-medium transition-colors ${active ? 'bg-brand-500 text-white' : 'text-surface-900 hover:bg-surface-100'}`}
                     >
                       <span className={`flex h-9 w-9 items-center justify-center rounded-full ${active ? 'bg-white/20' : 'bg-surface-100'}`}><Icon className="h-5 w-5" /></span>
-                      {label}
+                      {t(label)}
                     </Link>
                   );
                 })}
               </>
             ) : (
               <div className="space-y-2 p-2">
-                <Link href="/auth/login" className="flex h-11 items-center justify-center rounded-lg bg-surface-100 font-semibold text-surface-900">Log in</Link>
-                <Link href="/auth/signup" className="flex h-11 items-center justify-center rounded-lg bg-brand-500 font-semibold text-white">Sign up</Link>
+                <Link href="/auth/login" className="flex h-11 items-center justify-center rounded-lg bg-surface-100 font-semibold text-surface-900">{t('Log in')}</Link>
+                <Link href="/auth/signup" className="flex h-11 items-center justify-center rounded-lg bg-brand-500 font-semibold text-white">{t('Sign up')}</Link>
               </div>
             )}
           </div>
@@ -311,7 +322,7 @@ export default function Navbar({ user }) {
             <div className="border-t border-surface-200 p-2">
               <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 rounded-lg p-2 text-[15px] font-medium text-coral-600 transition-colors hover:bg-surface-100">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-coral-50"><LogOut className="h-5 w-5" /></span>
-                Log out
+                {t('Log out')}
               </button>
             </div>
           )}

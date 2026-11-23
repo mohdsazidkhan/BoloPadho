@@ -297,3 +297,18 @@ main.app-content > * > :last-child {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
 }
+
+/* Hindi (Devanagari) needs more vertical room: matras above and below the line get clipped or
+   crowded at Latin line heights. Applies when the site language is Hindi (<html lang="hi">). */
+html[lang='hi'] body {
+  line-height: 1.7;
+}
+html[lang='hi'] :is(h1, h2, h3, h4) {
+  line-height: 1.4;
+}
+html[lang='hi'] :is(.leading-none, .leading-tight, .leading-snug) {
+  line-height: 1.45;
+}
+html[lang='hi'] :is(.leading-relaxed, .leading-normal) {
+  line-height: 1.8;
+}

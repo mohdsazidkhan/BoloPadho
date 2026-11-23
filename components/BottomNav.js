@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { navFor, isActivePath } from '@/lib/navItems';
+import { useT } from './LanguageProvider';
 
 // Mobile/tablet tab bar (below lg) for signed-in users. Hidden on the full-height AI Tutor chat.
 export default function BottomNav({ user }) {
   const pathname = usePathname();
+  const t = useT();
   if (!user || pathname === '/user/chat' || pathname?.startsWith('/auth')) return null;
   const tabs = navFor(user).filter((i) => i.tab);
 
@@ -29,7 +31,7 @@ export default function BottomNav({ user }) {
             >
               {active && <span className="absolute inset-x-3 top-0 h-[3px] rounded-full bg-brand-500" />}
               <Icon className="h-6 w-6" strokeWidth={active ? 2.4 : 2} />
-              <span className="max-w-full truncate px-1">{label}</span>
+              <span className="max-w-full truncate px-1">{t(label)}</span>
             </Link>
           );
         })}

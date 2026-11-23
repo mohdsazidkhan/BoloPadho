@@ -3,6 +3,7 @@ import { Brain, Volume2, TrendingUp, CircleCheck, Mic, Camera, ArrowRight } from
 import Footer from '@/components/Footer';
 import HomeStats from '@/components/HomeStats';
 import LogoMark from '@/components/LogoMark';
+import { getT } from '@/lib/i18n/server';
 
 export const metadata = {
   title: 'BoloPadho — Apne Tarike Se Padho',
@@ -34,6 +35,7 @@ function AccentLast({ children }) {
 const card = 'fb-card p-4 xl:p-6';
 
 export default function LandingPage() {
+  const t = getT();
   return (
     <div className="flex min-h-screen flex-col">
       <div className="mx-auto w-full max-w-page flex-1 space-y-3 lg:space-y-4 p-3 pt-[calc(var(--navbar-h)+0.75rem)] lg:p-4 lg:pt-[calc(var(--navbar-h)+1rem)]">
@@ -42,25 +44,24 @@ export default function LandingPage() {
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-brand-500/15 px-3 py-1 text-sm font-semibold text-brand-600">
               <span className="h-2 w-2 animate-pulse rounded-full bg-brand-500" />
-              Voice-first AI tutor · Hindi, English, Hinglish
+              {t('Voice-first AI tutor · Hindi, English, Hinglish')}
             </span>
             <h1 className="mt-4 text-3xl font-bold leading-tight text-surface-900 sm:text-4xl lg:text-5xl">
-              Bolo apna sawaal. <span className="text-brand-500">Apne Tarike Se</span> Padho.
+              {t('Bolo apna sawaal.')} <span className="text-brand-500">{t('Apne Tarike Se')}</span> {t('Padho.')}
             </h1>
             <p className="mt-4 text-base leading-relaxed text-surface-500 sm:text-lg">
-              Stuck on a question late at night? Just <strong className="font-semibold text-surface-900">tap the mic and speak</strong>.
-              BoloPadho explains step by step in your language, reads the answer aloud and checks that you really understood.
-              You can also type, or send a photo of your book.
+              {t('Stuck on a question late at night? Just')} <strong className="font-semibold text-surface-900">{t('tap the mic and speak')}</strong>.{' '}
+              {t('BoloPadho explains step by step in your language, reads the answer aloud and checks that you really understood. You can also type, or send a photo of your book.')}
             </p>
             <div className="mt-6 flex flex-col gap-2 sm:flex-row">
               <Link href="/auth/signup" className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 font-semibold text-white transition hover:brightness-110">
-                Start learning free <ArrowRight className="h-4 w-4" />
+                {t('Start learning free')} <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/auth/login" className="inline-flex h-11 items-center justify-center rounded-lg bg-surface-100 px-5 font-semibold text-surface-900 transition-colors hover:bg-surface-200">
-                Log in
+                {t('Log in')}
               </Link>
             </div>
-            <p className="mt-3 text-sm text-surface-500">Free to start · For school, board and competitive exams</p>
+            <p className="mt-3 text-sm text-surface-500">{t('Free to start · For school, board and competitive exams')}</p>
           </div>
 
           {/* Chat preview */}
@@ -68,26 +69,26 @@ export default function LandingPage() {
             <div className="flex items-center gap-2 border-b border-surface-200 bg-surface-50 px-3 py-2.5">
               <LogoMark className="h-8 w-8" />
               <div>
-                <p className="text-sm font-semibold text-surface-900">BoloPadho Tutor</p>
-                <p className="text-xs text-brand-600">Ready to teach</p>
+                <p className="text-sm font-semibold text-surface-900">{t('BoloPadho Tutor')}</p>
+                <p className="text-xs text-brand-600">{t('Apne Tarike Se Padho')}</p>
               </div>
             </div>
             <div className="space-y-3 p-3 sm:p-4">
               <div className="flex justify-end">
                 <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-brand-500 px-3.5 py-2 text-sm text-white">
-                  Bhaiya, triangle ka area wala sawaal samajh nahi aaya. Base 8, height 5.
+                  {t('Bhaiya, triangle ka area wala sawaal samajh nahi aaya. Base 8, height 5.')}
                 </div>
               </div>
               <div className="flex items-end gap-2">
                 <LogoMark className="h-7 w-7 shrink-0" />
                 <div className="max-w-[85%] rounded-2xl rounded-bl-sm bg-surface-50 px-3.5 py-2 text-sm text-surface-900 shadow-card">
-                  Koi baat nahi! Triangle ka area = <strong>½ × base × height</strong>. Yahan ½ × 8 × 5 = <strong>20 sq units</strong>.
-                  Socho ek rectangle ko beech se aadha kaat diya, to triangle bachta hai…
+                  {t('Koi baat nahi! Triangle ka area =')} <strong>{t('½ × base × height')}</strong>. {t('Yahan ½ × 8 × 5 =')} <strong>{t('20 sq units')}</strong>.{' '}
+                  {t('Socho ek rectangle ko beech se aadha kaat diya, to triangle bachta hai…')}
                 </div>
               </div>
               <div className="flex items-center gap-2 rounded-full bg-surface-50 p-1.5 pl-2 shadow-card">
                 <Camera className="h-5 w-5 text-surface-500" />
-                <span className="flex-1 truncate text-sm text-surface-400">Bolo ya likho…</span>
+                <span className="flex-1 truncate text-sm text-surface-400">{t('Bolo ya likho…')}</span>
                 <Mic className="h-5 w-5 text-surface-500" />
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-white"><ArrowRight className="h-4 w-4" /></span>
               </div>
@@ -100,8 +101,8 @@ export default function LandingPage() {
 
         {/* ── Features ───────────────────────────────────────────────────── */}
         <section className={card}>
-          <h2 className="text-2xl font-bold text-surface-900 sm:text-3xl"><AccentLast>Kyun BoloPadho?</AccentLast></h2>
-          <p className="mt-1 text-surface-500">Made for students who find it easier to speak a doubt than to type it.</p>
+          <h2 className="text-2xl font-bold text-surface-900 sm:text-3xl"><AccentLast>{t('Kyun BoloPadho?')}</AccentLast></h2>
+          <p className="mt-1 text-surface-500">{t('Made for students who find it easier to speak a doubt than to type it.')}</p>
           <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {features.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="flex gap-3 rounded-lg border border-surface-200 p-3">
@@ -109,8 +110,8 @@ export default function LandingPage() {
                   <Icon className="h-5 w-5" />
                 </span>
                 <div>
-                  <h3 className="font-semibold text-surface-900">{title}</h3>
-                  <p className="mt-0.5 text-sm leading-relaxed text-surface-500">{desc}</p>
+                  <h3 className="font-semibold text-surface-900">{t(title)}</h3>
+                  <p className="mt-0.5 text-sm leading-relaxed text-surface-500">{t(desc)}</p>
                 </div>
               </div>
             ))}
@@ -119,14 +120,14 @@ export default function LandingPage() {
 
         {/* ── How it works ───────────────────────────────────────────────── */}
         <section className={card}>
-          <h2 className="text-2xl font-bold text-surface-900 sm:text-3xl"><AccentLast>Bas teen steps</AccentLast></h2>
+          <h2 className="text-2xl font-bold text-surface-900 sm:text-3xl"><AccentLast>{t('Bas teen steps')}</AccentLast></h2>
           <div className="mt-4 grid gap-3 md:grid-cols-3">
             {steps.map((s, i) => (
               <div key={s.title} className="flex gap-3 rounded-lg bg-surface-100 p-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500 font-bold text-white">{i + 1}</span>
                 <div>
-                  <h3 className="font-semibold text-surface-900">{s.title}</h3>
-                  <p className="mt-0.5 text-sm text-surface-500">{s.desc}</p>
+                  <h3 className="font-semibold text-surface-900">{t(s.title)}</h3>
+                  <p className="mt-0.5 text-sm text-surface-500">{t(s.desc)}</p>
                 </div>
               </div>
             ))}
@@ -137,11 +138,11 @@ export default function LandingPage() {
         <section className={`${card} flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left`}>
           <LogoMark className="h-14 w-14 shrink-0" />
           <div className="flex-1">
-            <h2 className="text-xl font-bold text-surface-900 sm:text-2xl"><AccentLast>Apna pehla sawaal bolo</AccentLast></h2>
-            <p className="text-surface-500">School homework, board exams or competitive exams: Apne Tarike Se Padho.</p>
+            <h2 className="text-xl font-bold text-surface-900 sm:text-2xl"><AccentLast>{t('Apna pehla sawaal bolo')}</AccentLast></h2>
+            <p className="text-surface-500">{t('School homework, board exams or competitive exams: Apne Tarike Se Padho.')}</p>
           </div>
           <Link href="/auth/signup" className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 font-semibold text-white transition hover:brightness-110">
-            Start free <ArrowRight className="h-4 w-4" />
+            {t('Start free')} <ArrowRight className="h-4 w-4" />
           </Link>
         </section>
       </div>

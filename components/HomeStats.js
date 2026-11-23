@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useT } from './LanguageProvider';
 
 const initialStats = [
   { label: 'Questions asked', value: '—' },
@@ -13,6 +14,7 @@ const formatCount = (value) => Number(value || 0).toLocaleString();
 
 export default function HomeStats() {
   const [stats, setStats] = useState(initialStats);
+  const t = useT();
 
   useEffect(() => {
     let active = true;
@@ -39,7 +41,7 @@ export default function HomeStats() {
       {stats.map((stat) => (
         <div key={stat.label} className="text-center">
           <div className="text-2xl font-bold text-brand-500 sm:text-3xl">{stat.value}</div>
-          <div className="text-sm text-surface-500">{stat.note || stat.label}</div>
+          <div className="text-sm text-surface-500">{t(stat.note || stat.label)}</div>
         </div>
       ))}
     </section>
