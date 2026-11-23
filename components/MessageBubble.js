@@ -21,6 +21,7 @@ import WaitingWord from './WaitingWord';
 import { toast } from 'react-toastify';
 import { canSpeak, speak, stopSpeaking, useSpeakingId, onSpeechProgress } from '@/lib/speech';
 import { createSpeechHighlighter } from '@/lib/speechHighlight';
+import LogoMark from '@/components/LogoMark';
 
 function formatTime(date) {
   if (!date) return '';
@@ -78,7 +79,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
 
   const handleShare = async () => {
     const shareData = {
-      title: 'AdaptUAI Tutor Response',
+      title: 'BoloPadho Tutor Response',
       text: message.content,
       url: window.location.href
     };
@@ -87,7 +88,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(`${shareData.text}\n\nShared from AdaptUAI: ${shareData.url}`);
+        await navigator.clipboard.writeText(`${shareData.text}\n\nShared from BoloPadho: ${shareData.url}`);
         toast.info('Link/Content copied to share! 🚀');
       }
     } catch (err) {
@@ -149,9 +150,7 @@ export default function MessageBubble({ message, compact = false, onRetry, onSto
               YOU
             </div>
           ) : (
-            <div className="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center">
-              <span className="text-base">🦉</span>
-            </div>
+            <LogoMark className="w-8 h-8" />
           )}
         </div>
       )}

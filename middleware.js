@@ -8,7 +8,7 @@ const AUTH_ROUTES = ['/auth/login', '/auth/signup'];
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
-  const tokenCookie = request.cookies.get('adaptuai_token');
+  const tokenCookie = request.cookies.get('bolopadho_token');
   const token = tokenCookie?.value;
 
   let user = null;

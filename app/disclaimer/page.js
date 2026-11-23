@@ -2,7 +2,7 @@ import LegalPage from '@/components/LegalPage';
 
 export const metadata = {
   title: 'Disclaimer',
-  description: 'Important limits of AI-generated answers on AdaptUAI.',
+  description: 'Important limits of AI-generated answers on BoloPadho.',
 };
 
 export default function DisclaimerPage() {
@@ -10,7 +10,7 @@ export default function DisclaimerPage() {
     <LegalPage
       current="/disclaimer"
       title="Disclaimer"
-      intro="AdaptUAI is a learning tool. Please read this before relying on its answers."
+      intro="BoloPadho is a learning tool. Please read this before relying on its answers."
       sections={[
         {
           heading: 'AI can make mistakes',
@@ -18,11 +18,11 @@ export default function DisclaimerPage() {
         },
         {
           heading: 'Not professional advice',
-          body: 'Nothing on AdaptUAI is medical, legal, financial, tax, psychological or other professional advice. For decisions in these areas, consult a qualified professional.',
+          body: 'Nothing on BoloPadho is medical, legal, financial, tax, psychological or other professional advice. For decisions in these areas, consult a qualified professional.',
         },
         {
           heading: 'Exams and coursework',
-          body: 'Use AdaptUAI to understand topics, not to submit AI answers as your own work where that is not allowed. Follow the rules of your school, university or exam board.',
+          body: 'Use BoloPadho to understand topics, not to submit AI answers as your own work where that is not allowed. Follow the rules of your school, university or exam board.',
         },
         {
           heading: 'Learning profile',
@@ -38,7 +38,7 @@ export default function DisclaimerPage() {
         },
         {
           heading: 'Limitation of liability',
-          body: 'AdaptUAI and its team are not responsible for any loss or damage that comes from relying on AI-generated content. Use the service with your own judgement.',
+          body: 'BoloPadho and its team are not responsible for any loss or damage that comes from relying on AI-generated content. Use the service with your own judgement.',
         },
       ]}
     />

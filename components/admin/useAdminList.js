@@ -59,7 +59,7 @@ export function useViewMode(storageKey) {
   const [desktop, setDesktop] = useState(true);
   // Phones and desktop remember their own choice, so a Table picked on desktop never
   // replaces the Grid default on a phone. Resizing across 1024px switches to that size's view.
-  const keyFor = (isDesktop) => `adaptuai-view-${storageKey}-${isDesktop ? 'desktop' : 'mobile'}`;
+  const keyFor = (isDesktop) => `bolopadho-view-${storageKey}-${isDesktop ? 'desktop' : 'mobile'}`;
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');

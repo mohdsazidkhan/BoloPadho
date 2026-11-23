@@ -54,7 +54,7 @@ function LoginContent() {
 
   return (
     <AuthShell
-      title={'Log in to AdaptUAI'}
+      title={'Log in to BoloPadho'}
       subtitle={'Continue your learning journey'}
     >
       {error && (

@@ -130,7 +130,7 @@ export async function POST(request) {
     // If the upload fails the model still gets the image inline, it just is not saved.
     if (imageForModel && !savedImage) {
       try {
-        const uploaded = await uploadImage(imageForModel, 'adaptuai/chats');
+        const uploaded = await uploadImage(imageForModel, 'bolopadho/chats');
         savedImage = uploaded.secure_url;
         imageForModel = savedImage;
       } catch (uploadError) {
@@ -199,6 +199,19 @@ export async function POST(request) {
         if (streamFailed || !fullResponse.trim()) return;
         try {
           chat.addMessage('assistant', fullResponse);
+
+          // Voice check reply: a wrong answer (❌) saves this chat's topic to "Need Practice";
+          // a right one (✅) clears it again.
+          if (activeMode === 'Check Reply') {
+            const practiceTopic = (chat.topic || chat.title || '').trim().slice(0, 60);
+            const verdict = fullResponse.trim().charAt(0);
+            if (practiceTopic && verdict === '❌') {
+              if (!user.weakAreas.includes(practiceTopic)) user.weakAreas.push(practiceTopic);
+              if (user.weakAreas.length > 10) user.weakAreas.shift();
+            } else if (practiceTopic && verdict === '✅') {
+              user.weakAreas = user.weakAreas.filter((t) => t !== practiceTopic);
+            }
+          }
 
           // Deduct AU (Consumption Mode)
           const tokenCost = Number(process.env.EACH_CHAT_AU_TOKEN) || 10;

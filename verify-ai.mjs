@@ -31,7 +31,7 @@ async function testAI() {
     return;
   }
   try {
-    const response = await generateCompletion('Respond with "AdaptUAI is live!"', [{ role: 'user', content: 'Hi' }]);
+    const response = await generateCompletion('Respond with "BoloPadho is live!"', [{ role: 'user', content: 'Hi' }]);
     console.log('AI Response:', response);
   } catch (err) {
     console.error('AI Error:', err.message);

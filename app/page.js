@@ -2,9 +2,10 @@ import Link from 'next/link';
 import { Brain, Zap, MessageCircle, TrendingUp, Target, ShieldCheck, Mic, Camera, ArrowRight } from 'lucide-react';
 import Footer from '@/components/Footer';
 import HomeStats from '@/components/HomeStats';
+import LogoMark from '@/components/LogoMark';
 
 export const metadata = {
-  title: 'AdaptUAI — Your Personalized AI Tutor',
+  title: 'BoloPadho — Apne Tarike Se Padho',
   description: 'Learn anything with an AI tutor that adapts to your mindset, learning style, and pace.',
 };
 
@@ -47,8 +48,8 @@ export default function LandingPage() {
               Learn anything with an AI tutor that adapts to <span className="text-brand-500">you</span>
             </h1>
             <p className="mt-4 text-base leading-relaxed text-surface-500 sm:text-lg">
-              AdaptUAI understands <strong className="font-semibold text-surface-900">how you think</strong>, matches your learning style
-              and gets smarter the more you use it. Ask by typing, by voice or with a photo. 🦉
+              BoloPadho understands <strong className="font-semibold text-surface-900">how you think</strong>, matches your learning style
+              and gets smarter the more you use it. Ask by typing, by voice or with a photo.
             </p>
             <div className="mt-6 flex flex-col gap-2 sm:flex-row">
               <Link href="/auth/signup" className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 font-semibold text-white transition hover:brightness-110">
@@ -64,9 +65,9 @@ export default function LandingPage() {
           {/* Chat preview */}
           <div className="overflow-hidden rounded-lg border border-surface-200 bg-background">
             <div className="flex items-center gap-2 border-b border-surface-200 bg-surface-50 px-3 py-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500">🦉</span>
+              <LogoMark className="h-8 w-8" />
               <div>
-                <p className="text-sm font-semibold text-surface-900">AdaptUAI Tutor</p>
+                <p className="text-sm font-semibold text-surface-900">BoloPadho Tutor</p>
                 <p className="text-xs text-brand-600">Ready to teach</p>
               </div>
             </div>
@@ -77,7 +78,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="flex items-end gap-2">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-500 text-sm">🦉</span>
+                <LogoMark className="h-7 w-7 shrink-0" />
                 <div className="max-w-[85%] rounded-2xl rounded-bl-sm bg-surface-50 px-3.5 py-2 text-sm text-surface-900 shadow-card">
                   Great question! 🌟 The event loop lets JavaScript stay <strong>non-blocking</strong> on a single thread. Think of
                   a chef taking new orders while food is still cooking. Here&apos;s how it works, step by step…
@@ -98,7 +99,7 @@ export default function LandingPage() {
 
         {/* ── Features ───────────────────────────────────────────────────── */}
         <section className={card}>
-          <h2 className="text-2xl font-bold text-surface-900 sm:text-3xl"><AccentLast>Why AdaptUAI is different</AccentLast></h2>
+          <h2 className="text-2xl font-bold text-surface-900 sm:text-3xl"><AccentLast>Why BoloPadho is different</AccentLast></h2>
           <p className="mt-1 text-surface-500">We don&apos;t just answer questions. We understand how you learn.</p>
           <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {features.map(({ icon: Icon, title, desc }) => (
@@ -133,10 +134,10 @@ export default function LandingPage() {
 
         {/* ── CTA ────────────────────────────────────────────────────────── */}
         <section className={`${card} flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left`}>
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-500 text-3xl">🦉</span>
+          <LogoMark className="h-14 w-14 shrink-0" />
           <div className="flex-1">
             <h2 className="text-xl font-bold text-surface-900 sm:text-2xl"><AccentLast>Ready to learn smarter?</AccentLast></h2>
-            <p className="text-surface-500">Join learners who use AdaptUAI every day.</p>
+            <p className="text-surface-500">Join learners who use BoloPadho every day.</p>
           </div>
           <Link href="/auth/signup" className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 font-semibold text-white transition hover:brightness-110">
             Get started free <ArrowRight className="h-4 w-4" />

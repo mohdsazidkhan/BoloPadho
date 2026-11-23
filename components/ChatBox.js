@@ -7,9 +7,11 @@ import { TypingIndicator } from './Loader';
 import { AUPopup } from './AUBadge';
 import api from '@/lib/api';
 import { toast } from 'react-toastify';
-import { ImagePlus, Mic, X, Send, SquarePen, Square, MoreVertical, Share2, Copy, Download, FileText, ArrowLeft, Volume2, VolumeX } from 'lucide-react';
+import { ImagePlus, Mic, X, Send, SquarePen, Square, MoreVertical, Share2, Copy, Download, FileText, ArrowLeft, Volume2, VolumeX, Check, RotateCcw, Pencil } from 'lucide-react';
 import { canSpeak, speak, stopSpeaking, useSpeakingId } from '@/lib/speech';
+import { detectVoiceCommand, COMMAND_REQUESTS, COMMAND_CHIPS, numbersIn } from '@/lib/voiceCommands';
 import Link from 'next/link';
+import LogoMark from '@/components/LogoMark';
 
 const DEBOUNCE_MS = 300;
 
@@ -33,6 +35,15 @@ const MODE_CHIPS = [
   { id: 'Check Answer', label: 'Check answer', hint: 'Marks your answer and shows mistakes', placeholder: 'Paste the question and your answer…' },
 ];
 const MAX_IMAGE_SIDE = 1280;
+// Seconds before a clearly heard voice question (no numbers, no noise) is sent on its own.
+const AUTO_SEND_SECONDS = 3;
+// What the learner sees when the mic could not hear them properly (Hinglish, like the tutor).
+const VOICE_ERRORS = {
+  'no-speech': 'Kuch sunai nahi diya. Mic dabakar phir se boliye.',
+  'audio-capture': 'Mic nahi mila. Mic lagakar phir try kariye.',
+  network: 'Voice ke liye internet chahiye. Internet check karke phir boliye.',
+};
+const NOISY = 'Thoda shor hai, shayad poora sahi nahi suna. Phone paas laakar dobara boliye.';
 const MIC_BLOCKED = 'Microphone is blocked. Click the lock icon in the address bar, allow the microphone, then try again.';
 
 // Photos are shrunk in the browser (max 1280px, JPEG) so uploads stay small and cheap for the AI.
@@ -57,7 +68,8 @@ function shrinkImage(file) {
   });
 }
 
-export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
+// reviseTopic: start a 2-minute revision quiz on this "Need Practice" topic (from the dashboard).
+export default function ChatBox({ user, initialSessionId = null, onSuccess, reviseTopic = null }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -71,7 +83,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
   // Remember the chosen answer style on this device.
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('adaptuai-mode');
+      const saved = localStorage.getItem('bolopadho-mode');
       if (saved && MODE_CHIPS.some((m) => m.id === saved)) setMode(saved);
     } catch { /* storage unavailable */ }
   }, []);
@@ -86,7 +98,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
     try {
       // Auto-read new answers by default. Keep an explicit saved choice if the learner
       // has already changed the speaker toggle on this device.
-      const saved = localStorage.getItem('adaptuai-read-aloud');
+      const saved = localStorage.getItem('bolopadho-read-aloud');
       const on = saved === null || saved === '1';
       setReadAloud(on);
       readAloudRef.current = on;
@@ -97,18 +109,26 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
     setReadAloud(on);
     readAloudRef.current = on;
     if (!on) stopSpeaking();
-    try { localStorage.setItem('adaptuai-read-aloud', on ? '1' : '0'); } catch { /* storage unavailable */ }
+    try { localStorage.setItem('bolopadho-read-aloud', on ? '1' : '0'); } catch { /* storage unavailable */ }
     toast.info(on ? 'Answers will be read aloud' : 'Read aloud is off', { autoClose: 1500 });
   };
 
   const chooseMode = (id) => {
     setMode(id);
-    try { localStorage.setItem('adaptuai-mode', id); } catch { /* storage unavailable */ }
+    try { localStorage.setItem('bolopadho-mode', id); } catch { /* storage unavailable */ }
   };
+  // Voice tutor: the heard question waiting for "Sahi hai" ({ text, numbers, noisy }), and whether the
+  // tutor just asked a check question (the learner's next reply is then marked ✅ / ❌).
+  const [heard, setHeard] = useState(null);
+  const [checkPending, setCheckPending] = useState(false);
+  const checkPendingRef = useRef(false);
+  const setCheck = (on) => { checkPendingRef.current = on; setCheckPending(on); };
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [listening, setListening] = useState(false);
   const fileRef = useRef(null);
   const recognitionRef = useRef(null);
+  const lastAnswerRef = useRef(null);
+  const runCommandRef = useRef(() => {});
 
   // Behavior tracking ref (not state — no re-renders)
   const metricsRef = useRef({
@@ -207,6 +227,16 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
   const sendMessage = useCallback(async (text, isRetry = false, photo = null, opts = {}) => {
     const trimmed = text.trim() || (photo ? 'Explain this image and solve the question in it.' : '');
     if (!trimmed || isStreaming) return;
+    // Offline: keep the question in the box instead of losing it.
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      toast.error('Internet nahi hai. Aapka sawaal box mein hai, internet aate hi bhej dijiye.');
+      setInput(trimmed);
+      return;
+    }
+    // A reply right after a check question is marked ✅ / ❌; tutor commands are never a reply.
+    const sendMode = opts.mode || (checkPendingRef.current && !opts.command ? 'Check Reply' : (mode !== 'auto' ? mode : null));
+    setHeard(null);
+    setCheck(false);
 
     recognitionRef.current?.abort();
     stopSpeaking();
@@ -245,7 +275,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
           ...(photo ? { image: photo } : {}),
           ...(opts.regenerate ? { regenerate: true } : {}),
           ...(Number.isInteger(opts.keepMessages) ? { keepMessages: opts.keepMessages } : {}),
-          ...(mode !== 'auto' ? { mode } : {}),
+          ...(sendMode ? { mode: sendMode } : {}),
           sessionId, // the server reads this chat's history from the database
           behaviorMetrics: {
             responseTimeMs: behaviorEvent.responseTimeMs,
@@ -353,6 +383,14 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
       // Read the answer aloud when the learner asked by voice or turned Read aloud on.
       if (viaVoice || readAloudRef.current) speak(answerAt.getTime(), accumulatedText);
 
+      // Check question / revision quiz asked: the next reply gets marked.
+      if (sendMode === 'Check Question' || sendMode === 'Revision Quiz') setCheck(true);
+      if (sendMode === 'Check Reply') {
+        const verdict = accumulatedText.trim().charAt(0);
+        if (verdict === '❌') toast.info('Ye topic "Need Practice" mein save ho gaya. Kal dashboard se 2 minute revise kar lena.', { autoClose: 5000 });
+        else if (verdict === '✅') toast.success('Shabash! Sahi jawab.');
+      }
+
       // Show AU popup with current cost
       const tokenCost = Number(process.env.NEXT_PUBLIC_EACH_CHAT_AU_TOKEN) || 10;
       setShowAUPopup(true);
@@ -385,7 +423,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
 
         toast.error(
           <div className="flex flex-col gap-2">
-            <p className="font-bold">Your AdaptUAI AU wallet is empty! 🕳️</p>
+            <p className="font-bold">Your BoloPadho AU wallet is empty! 🕳️</p>
             <p className="text-xs leading-relaxed opacity-90 font-medium">
               To continue, please contact our support to recharge your tokens.
             </p>
@@ -498,7 +536,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
   // ---- Voice: the browser's own speech-to-text (Chrome, Edge, Safari, Android). Send the
   // finalized transcript automatically when recognition ends.
   const stopVoice = () => recognitionRef.current?.stop();
-  const startVoice = async () => {
+  // fresh: ignore what is in the box ("Phir se bolo" starts over).
+  const startVoice = async ({ fresh = false } = {}) => {
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!Recognition || isStreaming || listening) return;
     stopSpeaking(); // do not let the tutor's voice be picked up by the mic
@@ -519,26 +558,39 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
     recognition.interimResults = true;
     recognition.continuous = false;
     recognition.maxAlternatives = 1;
-    const before = input.trim();
+    setHeard(null);
+    if (fresh) setInput('');
+    const before = fresh ? '' : input.trim();
     let spoken = '';
     let failed = false;
+    let noisy = false;
     recognition.onresult = (event) => {
       spoken = Array.from(event.results).map((r) => r[0]?.transcript || '').join(' ').replace(/\s+/g, ' ').trim();
+      // Low confidence on a final result usually means background noise (0 = browser did not say).
+      noisy = Array.from(event.results).some((r) => r.isFinal && r[0]?.confidence > 0 && r[0].confidence < 0.55);
       setInput(before ? `${before} ${spoken}` : spoken);
     };
     recognition.onerror = (event) => {
       failed = true;
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') toast.error(MIC_BLOCKED, { autoClose: 6000 });
-      else if (event.error !== 'aborted') toast.error("Didn't catch that. Please try again.");
+      else if (event.error !== 'aborted') toast.error(VOICE_ERRORS[event.error] || NOISY, { autoClose: 5000 });
     };
     recognition.onend = () => {
       setListening(false);
       recognitionRef.current = null;
-      if (!failed && !spoken) toast.error("Didn't catch that. Please try again.");
-      else if (!failed && spoken) {
-        voiceUsedRef.current = true;
-        sendMessage(before ? `${before} ${spoken}` : spoken, false, image);
-      }
+      if (failed) return;
+      if (!spoken) { toast.error(VOICE_ERRORS['no-speech']); return; }
+      const full = before ? `${before} ${spoken}` : spoken;
+      // A short follow-up like "phir se batao" right after an answer is a command, not a question.
+      const command = !before && !image && !checkPendingRef.current && lastAnswerRef.current ? detectVoiceCommand(spoken) : null;
+      if (command) { setInput(''); runCommandRef.current(command, true); return; }
+      voiceUsedRef.current = true;
+      // Show what was heard. Numbers are repeated back aloud and need a tap; a clear question
+      // without numbers is sent by itself after a few seconds.
+      const numbers = numbersIn(full);
+      setHeard({ text: full, numbers, noisy, at: Date.now() });
+      if (numbers.length) speak('confirm-heard', `Aapne ${numbers.join(' aur ')} bola, sahi?`);
+      else if (noisy) speak('confirm-heard', NOISY);
     };
     recognitionRef.current = recognition;
     setListening(true);
@@ -566,17 +618,17 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
 
   // Real conversation only: no welcome text, no failed or still-loading answers.
   const exportable = messages.filter((m, i) => !(i === 0 && m.role === 'assistant') && m.content?.trim() && !m.isError && !m._streamingId);
-  const chatTitle = (exportable.find((m) => m.role === 'user')?.content || 'AdaptUAI chat').replace(/\s+/g, ' ').slice(0, 60);
-  const fileBase = 'adaptuai-chat-' + (chatTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'export');
+  const chatTitle = (exportable.find((m) => m.role === 'user')?.content || 'BoloPadho chat').replace(/\s+/g, ' ').slice(0, 60);
+  const fileBase = 'bolopadho-chat-' + (chatTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'export');
   const nowText = () => new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
   const stamp = (m) => (m.timestamp ? new Date(m.timestamp).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : '');
 
   const buildText = () => [
-    'AdaptUAI chat: ' + chatTitle,
+    'BoloPadho chat: ' + chatTitle,
     'Exported ' + nowText(),
     '',
     ...exportable.map((m) => {
-      const who = m.role === 'user' ? 'You' : 'AdaptUAI Tutor';
+      const who = m.role === 'user' ? 'You' : 'BoloPadho Tutor';
       const photo = m.image ? (m.image.startsWith('http') ? m.image : '[photo attached]') + '\n' : '';
       return who + ' (' + stamp(m) + '):\n' + photo + m.content.trim() + (m.cancelled ? '\n[stopped]' : '') + '\n';
     }),
@@ -584,10 +636,10 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
 
   const buildMarkdown = () => [
     '# ' + chatTitle,
-    '_Exported from AdaptUAI on ' + nowText() + '_',
+    '_Exported from BoloPadho on ' + nowText() + '_',
     '',
     ...exportable.map((m) => {
-      const who = m.role === 'user' ? '🧑 **You**' : '🦉 **AdaptUAI Tutor**';
+      const who = m.role === 'user' ? '🧑 **You**' : '📚 **BoloPadho Tutor**';
       const img = m.image?.startsWith('http') ? '![Attached photo](' + m.image + ')\n\n' : m.image ? '_[photo attached]_\n\n' : '';
       return '### ' + who + ' · ' + stamp(m) + '\n\n' + img + m.content.trim() + (m.cancelled ? '\n\n_[stopped]_' : '') + '\n\n---\n';
     }),
@@ -613,7 +665,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
       else if (kind === 'copy') { await navigator.clipboard.writeText(buildText()); toast.success('Chat copied'); }
       else if (kind === 'share') {
         const text = buildText();
-        if (navigator.share) await navigator.share({ title: 'AdaptUAI: ' + chatTitle, text });
+        if (navigator.share) await navigator.share({ title: 'BoloPadho: ' + chatTitle, text });
         else { await navigator.clipboard.writeText(text); toast.success('Sharing is not available here, so the chat was copied'); }
       }
     } catch (err) {
@@ -632,6 +684,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
     abortControllerRef.current?.abort();
     stopSpeaking();
     voiceUsedRef.current = false;
+    setHeard(null);
+    setCheck(false);
     setSessionId(uuidv4());
     setMessages([
       {
@@ -655,7 +709,60 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
     '📐 What is calculus?',
   ];
 
-  const showSuggestions = messages.length <= 1;
+  const showSuggestions = messages.length <= 1 && !reviseTopic;
+
+  // ---- Voice tutor ----------------------------------------------------------------------------
+  // The latest finished answer (commands act on it).
+  const lastMsg = messages[messages.length - 1];
+  const lastAnswer = lastMsg?.role === 'assistant' && !lastMsg.welcome && !lastMsg.isError && !lastMsg.cancelled &&
+    !lastMsg._streamingId && lastMsg.content?.trim() ? lastMsg : null;
+  lastAnswerRef.current = lastAnswer;
+
+  // "Phir se batao" re-reads the answer slowly on the device (free); the others ask the tutor.
+  const runCommand = (command, fromVoice = false) => {
+    const answer = lastAnswerRef.current;
+    if (!answer || isStreaming) return;
+    if (command === 'repeat') {
+      if (!speak(new Date(answer.timestamp).getTime(), answer.content, { slow: true })) toast.error('Your browser cannot read this aloud.');
+      return;
+    }
+    const request = COMMAND_REQUESTS[command];
+    if (!request) return;
+    if (fromVoice) voiceUsedRef.current = true;
+    sendMessage(request.text, false, null, { mode: request.mode, command: true });
+  };
+  runCommandRef.current = runCommand;
+
+  const confirmHeard = () => {
+    if (!heard) return;
+    voiceUsedRef.current = true;
+    sendMessage(heard.text, false, image);
+  };
+  const reSpeak = () => { stopSpeaking(); setHeard(null); startVoice({ fresh: true }); };
+  const editHeard = () => {
+    stopSpeaking();
+    setHeard(null);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  // A clear question (no numbers, no noise) is sent by itself after AUTO_SEND_SECONDS.
+  const autoSend = !!heard && !heard.numbers.length && !heard.noisy;
+  const confirmRef = useRef(confirmHeard);
+  confirmRef.current = confirmHeard;
+  useEffect(() => {
+    if (!autoSend) return undefined;
+    const timer = setTimeout(() => confirmRef.current(), AUTO_SEND_SECONDS * 1000);
+    return () => clearTimeout(timer);
+  }, [autoSend, heard?.at]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Revision from the dashboard: start the 2-minute quiz once, then drop ?revise= from the URL.
+  const reviseStarted = useRef(false);
+  useEffect(() => {
+    if (!reviseTopic || initialSessionId || reviseStarted.current || !user) return;
+    reviseStarted.current = true;
+    try { window.history.replaceState(null, '', window.location.pathname); } catch { /* ignore */ }
+    sendMessage(`2-minute revision: ${reviseTopic}`, false, null, { mode: 'Revision Quiz' });
+  }, [reviseTopic, initialSessionId, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
@@ -674,13 +781,11 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-500 sm:h-10 sm:w-10">
-            <span className="text-lg">🦉</span>
-          </div>
+          <LogoMark className="h-8 w-8 shrink-0 sm:h-10 sm:w-10" />
           <div className="min-w-0">
             <p className="whitespace-nowrap text-sm font-semibold text-surface-900 sm:text-[15px]">
-              <span className="sm:hidden">AdaptUAI</span>
-              <span className="hidden sm:inline">AdaptUAI Tutor</span>
+              <span className="sm:hidden">BoloPadho</span>
+              <span className="hidden sm:inline">BoloPadho Tutor</span>
             </p>
             <p className={`hidden text-xs font-medium sm:block ${isStreaming ? 'text-brand-500 animate-pulse' : 'text-surface-400'}`}>
               {isStreaming ? 'Thinking...' : 'Ready to teach'}
@@ -807,6 +912,26 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
           })
         )}
 
+        {/* Voice tutor follow-ups for the latest answer (also understood when spoken) */}
+        {!isStreaming && lastAnswer && !checkPending && (
+          <div className="flex flex-wrap gap-1.5 pl-10" aria-label="Follow-up">
+            {COMMAND_CHIPS.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => runCommand(c.id)}
+                className={`h-8 rounded-full px-3 text-xs font-semibold transition-colors ${c.id === 'understood' ? 'bg-brand-500 text-white hover:brightness-110' : 'bg-surface-100 text-surface-900 hover:bg-surface-200'}`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        )}
+        {!isStreaming && checkPending && (
+          <p className="pl-10 text-xs font-semibold text-brand-600">
+            Jawab bolo ya likho, main check karunga.
+          </p>
+        )}
 
         {/* Suggested topics */}
         {showSuggestions && (
@@ -881,6 +1006,36 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
             </button>
           ))}
         </div>
+        {heard && (
+          <div className="mb-2 rounded-xl border border-surface-200 bg-surface-100 p-2.5 animate-slide-up" role="status">
+            <p className="text-xs font-semibold text-surface-500">Maine suna:</p>
+            <p className="mt-0.5 break-words text-sm font-medium text-surface-900">
+              {heard.text.split(/(\d+(?:[.,]\d+)?)/).map((part, i) => (/^\d/.test(part)
+                ? <mark key={i} className="rounded bg-brand-500/20 px-0.5 font-bold text-surface-900">{part}</mark>
+                : <span key={i}>{part}</span>))}
+            </p>
+            {heard.numbers.length > 0 && (
+              <p className="mt-1 text-xs text-surface-600">Aapne <b>{heard.numbers.join(' aur ')}</b> bola, sahi?</p>
+            )}
+            {heard.noisy && <p className="mt-1 text-xs font-medium text-coral-600">{NOISY}</p>}
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <button type="button" onClick={confirmHeard} className="inline-flex h-8 items-center gap-1.5 rounded-full bg-brand-500 px-3 text-xs font-semibold text-white transition hover:brightness-110">
+                <Check className="h-3.5 w-3.5" /> Sahi hai{autoSend ? ', bhej raha hu…' : ''}
+              </button>
+              <button type="button" onClick={reSpeak} className="inline-flex h-8 items-center gap-1.5 rounded-full bg-surface-50 px-3 text-xs font-semibold text-surface-900 transition-colors hover:bg-surface-200">
+                <RotateCcw className="h-3.5 w-3.5" /> Phir se bolo
+              </button>
+              <button type="button" onClick={editHeard} className="inline-flex h-8 items-center gap-1.5 rounded-full bg-surface-50 px-3 text-xs font-semibold text-surface-900 transition-colors hover:bg-surface-200">
+                <Pencil className="h-3.5 w-3.5" /> Edit
+              </button>
+            </div>
+            {autoSend && (
+              <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-200">
+                <div key={heard.at} className="h-full origin-left rounded-full bg-brand-500" style={{ animation: `heard-countdown ${AUTO_SEND_SECONDS}s linear forwards` }} />
+              </div>
+            )}
+          </div>
+        )}
         {image && (
           <div className="mb-2 flex items-center gap-2">
             <span className="relative">
@@ -916,6 +1071,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess }) {
             value={input}
             onChange={(e) => {
               setInput(e.target.value);
+              if (heard) setHeard(null); // typing means the learner is fixing it themselves
               if (!e.target.value.trim()) voiceUsedRef.current = false;
             }}
             onKeyDown={handleKeyDown}

@@ -23,7 +23,7 @@ async function testPrompt() {
 async function testAI() {
   console.log('--- Testing AI Connectivity ---');
   try {
-    const response = await generateCompletion('Respond with "Hello, I am AdaptUAI"', [{ role: 'user', content: 'Hi' }]);
+    const response = await generateCompletion('Respond with "Hello, I am BoloPadho"', [{ role: 'user', content: 'Hi' }]);
     console.log('AI Response:', response);
   } catch (err) {
     console.error('AI Error:', err.message);

@@ -12,14 +12,14 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export const metadata = {
   title: {
-    default: 'AdaptUAI — AI that adapts to you',
-    template: '%s | AdaptUAI',
+    default: 'BoloPadho — Apne Tarike Se Padho',
+    template: '%s | BoloPadho',
   },
   description:
-    'AdaptUAI — AI that adapts to you. An intelligent tutor that adjusts to your mindset, learning style, and pace.',
+    'BoloPadho — Apne Tarike Se Padho. A voice-first AI tutor that adjusts to your mindset, learning style, and pace.',
   keywords: ['AI tutor', 'learn', 'education', 'personalized learning', 'AI teacher'],
   openGraph: {
-    title: 'AdaptUAI — Your Personalized AI Tutor',
+    title: 'BoloPadho — Apne Tarike Se Padho',
     description: 'An intelligent AI tutor that adapts to your mindset and learning style.',
     type: 'website',
   },

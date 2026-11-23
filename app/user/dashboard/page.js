@@ -10,6 +10,7 @@ import ProgressBar from '@/components/ProgressBar';
 import { PageLoader } from '@/components/Loader';
 import Button from '@/components/Button';
 import api from '@/lib/api';
+import LogoMark from '@/components/LogoMark';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -149,7 +150,7 @@ export default function DashboardPage() {
                     ))
                   ) : (
                     <div className="text-center py-8">
-                      <p className="text-4xl mb-3">🦉</p>
+                      <LogoMark className="mx-auto mb-3 h-12 w-12" />
                       <p className="text-surface-500 font-semibold mb-4">No learning sessions yet.</p>
                       <Link href="/user/chat">
                         <Button variant="outline" size="sm">Start your first lesson</Button>
@@ -206,9 +207,14 @@ export default function DashboardPage() {
                 <div className="flex flex-wrap gap-2 text-center">
                   {(user?.weakAreas?.length || 0) > 0 ? (
                     user.weakAreas.map((topic) => (
-                      <span key={topic} className="px-3 py-1.5 bg-coral-50 border border-coral-200 rounded-full text-xs font-bold text-coral-700">
-                        {topic}
-                      </span>
+                      <Link
+                        key={topic}
+                        href={`/user/chat?revise=${encodeURIComponent(topic)}`}
+                        title="Start a 2-minute revision"
+                        className="px-3 py-1.5 bg-coral-50 border border-coral-200 rounded-full text-xs font-bold text-coral-700 transition-colors hover:bg-coral-100"
+                      >
+                        {topic} · Revise
+                      </Link>
                     ))
                   ) : (
                     <p className="text-xs text-surface-400 font-medium">You&apos;re doing great — no weak areas detected! ✨</p>

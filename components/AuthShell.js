@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Footer from './Footer';
+import LogoMark from '@/components/LogoMark';
 
 // Field style shared by the auth forms: one grey fill, thin brand ring on focus.
 export const authInput =
@@ -15,13 +16,13 @@ export default function AuthShell({ title, subtitle, children }) {
       <div className="mx-auto flex w-full max-w-page flex-1 flex-col items-center justify-center gap-6 p-3 pt-[calc(var(--navbar-h)+0.75rem)] lg:p-4 lg:pt-[calc(var(--navbar-h)+1rem)] lg:flex-row lg:justify-between lg:gap-12">
         <div className="max-w-md text-center lg:text-left">
           <Link href="/" className="inline-flex items-center gap-2">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-500 text-2xl">🦉</span>
+            <LogoMark className="h-12 w-12" />
             <span className="text-4xl font-bold sm:text-5xl">
-              <span className="text-surface-900">AdaptU</span><span className="text-brand-500">AI</span>
+              <span className="text-surface-900">Bolo</span><span className="text-brand-500">Padho</span>
             </span>
           </Link>
           <p className="mt-3 hidden text-2xl leading-snug text-surface-900 sm:block">
-            The AI tutor that adapts to how <span className="text-brand-500">you</span> learn.
+            Apne <span className="text-brand-500">Tarike</span> Se Padho.
           </p>
         </div>
 

@@ -6,7 +6,7 @@ import { Bell, Mail, CheckCheck, Coins } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import api from '@/lib/api';
 
-export const NOTIFICATIONS_CHANGED = 'adaptuai:notifications-changed';
+export const NOTIFICATIONS_CHANGED = 'bolopadho:notifications-changed';
 const POLL_MS = 60 * 1000;
 
 // Icon + colour per notification type.

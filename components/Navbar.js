@@ -9,6 +9,7 @@ import NotificationBell from './NotificationBell';
 import { useTheme } from './ThemeProvider';
 import api from '@/lib/api';
 import { navFor, homeFor, isActivePath, avatarFor } from '@/lib/navItems';
+import LogoMark from '@/components/LogoMark';
 
 // Round grey icon button used for every header action (Facebook style).
 const roundBtn =
@@ -17,10 +18,10 @@ const roundBtn =
 export function Logo({ href = '/', onClick }) {
   return (
     <Link href={href} onClick={onClick} className="flex shrink-0 items-center gap-1.5">
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-lg sm:h-10 sm:w-10 sm:text-xl">🦉</span>
+      <LogoMark className="h-8 w-8 sm:h-10 sm:w-10" />
       <span className="text-lg font-bold leading-none sm:text-xl">
-        <span className="text-surface-900">AdaptU</span>
-        <span className="text-brand-500">AI</span>
+        <span className="text-surface-900">Bolo</span>
+        <span className="text-brand-500">Padho</span>
       </span>
     </Link>
   );

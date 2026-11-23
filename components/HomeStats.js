@@ -35,7 +35,7 @@ export default function HomeStats() {
   }, []);
 
   return (
-    <section className="fb-card grid grid-cols-2 gap-4 p-4 md:grid-cols-4 xl:p-6" aria-label="AdaptUAI usage statistics">
+    <section className="fb-card grid grid-cols-2 gap-4 p-4 md:grid-cols-4 xl:p-6" aria-label="BoloPadho usage statistics">
       {stats.map((stat) => (
         <div key={stat.label} className="text-center">
           <div className="text-2xl font-bold text-brand-500 sm:text-3xl">{stat.value}</div>

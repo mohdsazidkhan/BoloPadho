@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ───────── Theme tokens (Facebook-style greys + AdaptUAI's own green brand) ─────────
+/* ───────── Theme tokens (Facebook-style greys + BoloPadho's own green brand) ─────────
    Every colour in the app comes from these variables, so light/dark and the brand stay in one place.
    background = page grey, surface-50 = cards/navbar, surface-100 = grey fills (fields, secondary
    buttons, hover rows), surface-200/300 = borders, surface-400…900 = text from muted to primary. */
@@ -290,4 +290,10 @@ main.app-content > * > :last-child {
 ::highlight(speak-word) {
   background-color: #000000;
   color: #ffffff;
+}
+
+/* Voice tutor: "Maine suna" card auto-send countdown */
+@keyframes heard-countdown {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }

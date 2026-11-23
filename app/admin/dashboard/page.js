@@ -55,7 +55,7 @@ export default function AdminDashboard() {
       const a = document.createElement('a');
       a.hidden = true;
       a.href = url;
-      a.download = `adaptuai_students_export_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `bolopadho_students_export_${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

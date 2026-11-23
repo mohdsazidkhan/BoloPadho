@@ -2,7 +2,7 @@ import LegalPage from '@/components/LegalPage';
 
 export const metadata = {
   title: 'Privacy Policy',
-  description: 'What data AdaptUAI collects, why, and how you can control it.',
+  description: 'What data BoloPadho collects, why, and how you can control it.',
 };
 
 export default function PrivacyPage() {
@@ -10,7 +10,7 @@ export default function PrivacyPage() {
     <LegalPage
       current="/privacy"
       title="Privacy Policy"
-      intro="This policy explains what information AdaptUAI collects when you use it, why we collect it, who we share it with and the choices you have."
+      intro="This policy explains what information BoloPadho collects when you use it, why we collect it, who we share it with and the choices you have."
       sections={[
         {
           heading: 'Information we collect',
@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         },
         {
           heading: 'Voice input',
-          body: 'When you use the microphone button, your browser’s built-in speech service (for example Google in Chrome) turns speech into text. AdaptUAI does not record or store audio, only the text you choose to send.',
+          body: 'When you use the microphone button, your browser’s built-in speech service (for example Google in Chrome) turns speech into text. BoloPadho does not record or store audio, only the text you choose to send.',
         },
         {
           heading: 'How we use it',
@@ -64,7 +64,7 @@ export default function PrivacyPage() {
         },
         {
           heading: 'Children',
-          body: 'AdaptUAI is meant for learners aged 13 and above. If you are under 18, use it with a parent or guardian’s permission. If you believe a child under 13 has given us data, contact us and we will delete it.',
+          body: 'BoloPadho is meant for learners aged 13 and above. If you are under 18, use it with a parent or guardian’s permission. If you believe a child under 13 has given us data, contact us and we will delete it.',
         },
         {
           heading: 'Changes to this policy',

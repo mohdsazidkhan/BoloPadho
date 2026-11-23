@@ -2,16 +2,16 @@ import LegalPage from '@/components/LegalPage';
 
 export const metadata = {
   title: 'About',
-  description: 'AdaptUAI is an AI tutor that adapts to how you learn: your pace, confidence and learning style.',
+  description: 'BoloPadho is an AI tutor that adapts to how you learn: your pace, confidence and learning style.',
 };
 
 export default function AboutPage() {
   return (
     <LegalPage
       current="/about"
-      title="About AdaptUAI"
+      title="About BoloPadho"
       showUpdated={false}
-      intro="AdaptUAI is an AI tutor that adapts to you. Ask about any subject (maths, science, coding, history, languages, career skills) and it explains in the way that works best for you."
+      intro="BoloPadho is an AI tutor that adapts to you. Ask about any subject (maths, science, coding, history, languages, career skills) and it explains in the way that works best for you."
       sections={[
         {
           heading: 'What makes it different',

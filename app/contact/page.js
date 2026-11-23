@@ -1,10 +1,11 @@
 import { Mail, MessageCircle, Clock, Headset, Rocket, ShieldCheck, GraduationCap } from 'lucide-react';
 import ContactForm from '@/components/ContactForm';
 import Footer from '@/components/Footer';
+import LogoMark from '@/components/LogoMark';
 
 export const metadata = {
   title: 'Contact',
-  description: 'Get in touch with the AdaptUAI team for help with your account, AU recharge, feedback or partnerships.',
+  description: 'Get in touch with the BoloPadho team for help with your account, AU recharge, feedback or partnerships.',
 };
 
 const EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@mohdsazidkhan.com';
@@ -13,7 +14,7 @@ const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_CONTACT || '';
 const features = [
   { icon: Rocket, title: 'Fast reply', desc: 'We reply within 24 hours on working days.' },
   { icon: ShieldCheck, title: 'Always available', desc: 'Write to us any time. We are here to help.' },
-  { icon: GraduationCap, title: 'Helpful team', desc: 'We know AdaptUAI well and can sort out your problem quickly.' },
+  { icon: GraduationCap, title: 'Helpful team', desc: 'We know BoloPadho well and can sort out your problem quickly.' },
 ];
 
 export default function ContactPage() {
@@ -64,7 +65,7 @@ export default function ContactPage() {
             </address>
 
             <section className="fb-card flex flex-1 items-center gap-3 p-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-500 text-2xl">🦉</span>
+              <LogoMark className="h-11 w-11 shrink-0" />
               <div>
                 <h2 className="text-lg font-bold text-surface-900">We are here for you</h2>
                 <p className="text-sm text-surface-500">Learners always come first. Tell us what you need and we will help.</p>

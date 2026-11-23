@@ -9,6 +9,7 @@ import { PageLoader } from '@/components/Loader';
 import { PageHeader, SearchField, Pill, IconButton, brandBtn, fmtDateTime } from '@/components/admin/ui';
 import DataView, { ViewToggle } from '@/components/admin/DataView';
 import { useViewMode } from '@/components/admin/useAdminList';
+import LogoMark from '@/components/LogoMark';
 
 export default function ChatHistoryPage() {
   const router = useRouter();
@@ -88,7 +89,7 @@ export default function ChatHistoryPage() {
           <section className="fb-card table-scroll">
             {chats.length === 0 ? (
               <div className="flex min-h-full flex-col items-center justify-center gap-3 px-4 py-12 text-center">
-                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-500 text-3xl">🦉</span>
+                <LogoMark className="h-14 w-14" />
                 <p className="font-semibold text-surface-900">No chats yet</p>
                 <p className="text-sm text-surface-500">Ready to start your first session?</p>
                 <Link href="/user/chat" className={brandBtn}>Start learning</Link>

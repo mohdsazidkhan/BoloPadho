@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LogoMark from '@/components/LogoMark';
 
 export const LEGAL_LINKS = [
   { href: '/about', label: 'About' },
@@ -18,7 +19,7 @@ export function LegalLinks({ className = '' }) {
           <Link href={l.href} className="hover:underline">{l.label}</Link>
         </span>
       ))}
-      <span className="w-full pt-0.5">© {new Date().getFullYear()} AdaptUAI</span>
+      <span className="w-full pt-0.5">© {new Date().getFullYear()} BoloPadho</span>
     </nav>
   );
 }
@@ -28,9 +29,9 @@ export default function Footer() {
     <footer className="border-t border-surface-200 bg-surface-50">
       <div className="mx-auto flex max-w-page flex-col gap-3 p-3 lg:p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-base">🦉</span>
+          <LogoMark className="h-8 w-8" />
           <p className="text-sm text-surface-500">
-            © {new Date().getFullYear()} <span className="font-semibold text-surface-900">AdaptUAI</span> · AI that adapts to you
+            © {new Date().getFullYear()} <span className="font-semibold text-surface-900">BoloPadho</span> · Apne Tarike Se Padho
           </p>
         </div>
         <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-surface-500">

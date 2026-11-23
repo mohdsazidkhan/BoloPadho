@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <circle cx="32" cy="32" r="32" fill="#3EA401"/>
-  <text x="32" y="34" text-anchor="middle" dominant-baseline="central" font-size="40" font-family="'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif">🦉</text>
+  <path d="M18 14h28a8 8 0 0 1 8 8v15a8 8 0 0 1-8 8H31l-10 8v-8h-3a8 8 0 0 1-8-8V22a8 8 0 0 1 8-8z" fill="#fff"/>
+  <path d="M19.5 23.5c4-2.2 8.2-2.2 11.5 0v15c-3.3-2.2-7.5-2.2-11.5 0z" fill="#3EA401"/>
+  <path d="M33 23.5c3.3-2.2 7.5-2.2 11.5 0v15c-4-2.2-8.2-2.2-11.5 0z" fill="#3EA401"/>
 </svg>

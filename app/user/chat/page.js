@@ -11,6 +11,7 @@ function ChatContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('sessionId');
+  const reviseTopic = searchParams.get('revise');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +40,7 @@ function ChatContent() {
       <main className="flex-1 min-w-0 overflow-hidden lg:ml-sidebar h-screen h-[100dvh] lg:pt-navbar flex flex-col">
         <div className="mx-auto flex w-full max-w-page flex-1 min-h-0 flex-col lg:p-4">
           <div className="flex-1 min-h-0 overflow-hidden bg-surface-50 lg:rounded-lg lg:shadow-card">
-            <ChatBox user={user} initialSessionId={sessionId} onSuccess={fetchUser} />
+            <ChatBox user={user} initialSessionId={sessionId} onSuccess={fetchUser} reviseTopic={reviseTopic} />
           </div>
         </div>
       </main>

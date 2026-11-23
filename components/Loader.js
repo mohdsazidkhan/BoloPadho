@@ -1,5 +1,7 @@
 'use client';
 
+import LogoMark from '@/components/LogoMark';
+
 export default function Loader({ size = 'md', text = '' }) {
   const dotSizes = {
     sm: 'w-2 h-2',
@@ -30,7 +32,7 @@ export function PageLoader() {
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-background">
       <div className="fb-card flex flex-col items-center justify-center gap-3 px-8 py-6 animate-fade-in">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-500 text-3xl">🦉</span>
+        <LogoMark className="h-14 w-14" />
         <Loader size="md" />
       </div>
     </div>
