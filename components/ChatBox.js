@@ -467,7 +467,7 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
           m._streamingId === streamingId
             ? {
               ...m,
-              content: outOfAU ? '⚠️ Your AU balance is too low for this answer. Recharge to continue.' : `⚠️ ${errorMsg}`,
+              content: outOfAU ? t('⚠️ Your AU balance is too low for this answer. Recharge to continue.') : `⚠️ ${t(errorMsg)}`,
               _streamingId: undefined,
               isError: true,
               // Retrying cannot help while the wallet is empty.

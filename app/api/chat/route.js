@@ -14,6 +14,8 @@ import { levelFor, touchStreak } from '@/lib/learnerLevel';
 import { uploadImage } from '@/lib/cloudinary';
 import { getLang } from '@/lib/i18n/server';
 
+const AI_KEY_NOT_SET = 'AI key not set. Add OPENROUTER_API_KEY to the .env file (see README) to get answers.';
+
 export const dynamic = 'force-dynamic';
 
 // The chat box shrinks photos to <=1280px JPEG before sending, so ~2 MB of base64 is plenty.
@@ -31,6 +33,12 @@ export async function POST(request) {
     const authUser = await getAuthUser(request);
     if (!authUser) {
       return NextResponse.json({ error: 'Unauthorized. Please log in.' }, { status: 401 });
+    }
+
+    // No AI key configured (for example a fresh "docker compose up"): say so clearly instead of
+    // failing later. Nothing is saved and no AU is spent.
+    if (!process.env.OPENROUTER_API_KEY) {
+      return NextResponse.json({ error: AI_KEY_NOT_SET }, { status: 503 });
     }
 
     await dbConnect();

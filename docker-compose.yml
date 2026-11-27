@@ -1,0 +1,46 @@
+# One command: `docker compose up --build`, then open http://localhost:3000
+#
+# Starts the app and its own MongoDB. No secret keys are needed to start and use the site
+# (sign up, dashboard, voice input, read-aloud, languages). Without OPENROUTER_API_KEY the AI tutor
+# replies with a clear "AI key not set" message. To get real answers, put your key in a .env file
+# next to this one (see .env.example); docker compose reads it automatically.
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      - "3000:3000"
+    environment:
+      # Always the bundled database, even if your .env points somewhere else
+      MONGODB_URI: mongodb://mongo:27017/BoloPadho
+      # A local-only default so login works out of the box; set your own in .env for real use
+      JWT_SECRET: ${JWT_SECRET:-local-docker-only-change-me}
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      # Optional keys (empty = feature shows a "key not set" message or is skipped)
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      AI_BASE_URL: ${AI_BASE_URL:-https://openrouter.ai/api/v1}
+      AI_MODEL: ${AI_MODEL:-}
+      AI_MODEL1: ${AI_MODEL1:-}
+      AI_MODEL2: ${AI_MODEL2:-}
+      AI_MODEL3: ${AI_MODEL3:-}
+      AI_MODEL4: ${AI_MODEL4:-}
+      AI_VISION_MODEL: ${AI_VISION_MODEL:-}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      EACH_CHAT_AU_TOKEN: ${EACH_CHAT_AU_TOKEN:-10}
+      WELCOME_AU_TOKENS: ${WELCOME_AU_TOKENS:-100}
+
+volumes:
+  mongo-data:
