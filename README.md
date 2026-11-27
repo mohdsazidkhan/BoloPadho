@@ -4,6 +4,8 @@ A voice-first AI study tutor for students in India. Speak your doubt in Hindi, E
 listen to a step-by-step answer, and check that you really understood. Built for **Scaler × Wispr
 Flow "Build for Bharat"**, theme **Inclusive education**.
 
+**Live:** <https://bolopadho.vercel.app> · **Pitch deck:** [docs/BoloPadho-Pitch-Deck.pdf](docs/BoloPadho-Pitch-Deck.pdf)
+
 Many students in small towns can say a doubt in five seconds but need minutes to type it, especially
 in Hindi, and usually there is nobody to ask at night. BoloPadho lets them simply speak.
 

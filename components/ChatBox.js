@@ -38,6 +38,9 @@ const MODE_CHIPS = [
 const MAX_IMAGE_SIDE = 1280;
 // Seconds before a clearly heard voice question (no numbers, no noise) is sent on its own.
 const AUTO_SEND_SECONDS = 3;
+// Voice input: stop listening after this much quiet once the learner has said something, or at the cap.
+const SILENCE_STOP_MS = 1800;
+const MAX_LISTEN_MS = 25000;
 // What the learner sees when the mic could not hear them properly (Hinglish, like the tutor).
 const VOICE_ERRORS = {
   'no-speech': 'Kuch sunai nahi diya. Mic dabakar phir se boliye.',
@@ -561,7 +564,9 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
     // which writes Hinglish in Latin letters.
     recognition.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
     recognition.interimResults = true;
-    recognition.continuous = false;
+    // Keep listening across the short pauses people make mid-question ("…samajh nahi aaya. Base 8,
+    // height 5"); stop after SILENCE_STOP_MS without new words, or MAX_LISTEN_MS in total.
+    recognition.continuous = true;
     recognition.maxAlternatives = 1;
     setHeard(null);
     if (fresh) setInput('');
@@ -569,7 +574,11 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
     let spoken = '';
     let failed = false;
     let noisy = false;
+    let silenceTimer = null;
+    const maxTimer = setTimeout(() => recognition.stop(), MAX_LISTEN_MS);
     recognition.onresult = (event) => {
+      clearTimeout(silenceTimer);
+      silenceTimer = setTimeout(() => recognition.stop(), SILENCE_STOP_MS);
       spoken = Array.from(event.results).map((r) => r[0]?.transcript || '').join(' ').replace(/\s+/g, ' ').trim();
       // Low confidence on a final result usually means background noise (0 = browser did not say).
       noisy = Array.from(event.results).some((r) => r.isFinal && r[0]?.confidence > 0 && r[0].confidence < 0.55);
@@ -581,6 +590,8 @@ export default function ChatBox({ user, initialSessionId = null, onSuccess, revi
       else if (event.error !== 'aborted') toast.error(t(VOICE_ERRORS[event.error] || NOISY), { autoClose: 5000 });
     };
     recognition.onend = () => {
+      clearTimeout(silenceTimer);
+      clearTimeout(maxTimer);
       setListening(false);
       recognitionRef.current = null;
       if (failed) return;
